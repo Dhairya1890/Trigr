@@ -237,11 +237,11 @@ Ravi's High risk tier earns him 80% coverage, a higher rate than lower-risk tier
 
 ### Edge Cases
 
-**Ravi was not on shift during the disruption.** If the disruption window (say, 2am–5am) does not overlap with Ravi's shift (10am–10pm), his overlap is zero hours and his payout is Rs 0. The system only compensates for hours that would have been working hours.
+- **Ravi was not on shift during the disruption:** If the disruption window (say, 2am–5am) does not overlap with Ravi's shift (10am–10pm), his overlap is zero hours and his payout is Rs 0. The system only compensates for hours that would have been working hours.
 
-**Two disruptions in one week.** Payouts accumulate against the weekly cap. If Ravi receives Rs 250 on Monday and Rs 300 on Thursday, both are paid. If a third event would push his total above Rs 3,600, the third payout is capped at the remaining balance.
+- **Two disruptions in one week:** Payouts accumulate against the weekly cap. If Ravi receives Rs 250 on Monday and Rs 300 on Thursday, both are paid. If a third event would push his total above Rs 3,600, the third payout is capped at the remaining balance.
 
-**Disruption shorter than 60 minutes.** Brief rain events that resolve quickly do not qualify. A minimum 60-minute duration is required before a trigger fires, preventing micro-payouts from fleeting weather changes.
+- **Disruption shorter than 60 minutes:** Brief rain events that resolve quickly do not qualify. A minimum 60-minute duration is required before a trigger fires, preventing micro-payouts from fleeting weather changes.
 
 ---
 
@@ -304,13 +304,13 @@ Three machine learning models operate across the full platform lifecycle. Each m
 
 ![Architecture Intelligence](img/arch_intelligence.png)
 
-### The Three Models
+### The Three Models :
 
-**Risk Scorer** runs once when Ravi registers. It takes his city, zone type, platform, shift pattern, and the current season as inputs and outputs a risk score and tier. This tier sets his base premium multiplier and coverage percentage. When Ravi signs up in July in Dharavi, his score of 85 places him in the High tier immediately.
+- **Risk Scorer:** Runs once when Ravi registers. It takes his city, zone type, platform, shift pattern, and the current season as inputs and outputs a risk score and tier. This tier sets his base premium multiplier and coverage percentage. When Ravi signs up in July in Dharavi, his score of 85 places him in the High tier immediately.
 
-**Dynamic Premium Adjuster** runs every Monday morning for all workers with active or renewing policies. It takes the 7-day weather and AQI forecast, any known upcoming events, the city-wide loss ratio for the past 4 weeks, and the individual worker's claim history. It outputs an adjusted premium for the coming week. If Mumbai's forecast shows 3 heavy rain days in the coming week, Ravi's premium increases modestly. If he has gone 8 consecutive weeks without a claim, a loyalty factor reduces his premium slightly.
+- **Dynamic Premium Adjuster:** Runs every Monday morning for all workers with active or renewing policies. It takes the 7-day weather and AQI forecast, any known upcoming events, the city-wide loss ratio for the past 4 weeks, and the individual worker's claim history. It outputs an adjusted premium for the coming week. If Mumbai's forecast shows 3 heavy rain days in the coming week, Ravi's premium increases modestly. If he has gone 8 consecutive weeks without a claim, a loyalty factor reduces his premium slightly.
 
-**Fraud Detector** runs once per worker per disruption event. It scores each potential claim from 0 to 100. Claims scoring above 70 are flagged for manual review. Claims scoring above 90 are automatically rejected. The model checks GPS zone match against registered zone, whether the app was active before the trigger fired, whether the worker was moving (proving active delivery), account age, device fingerprint uniqueness across all accounts, and claim frequency over the past 4 weeks.
+- **Fraud Detector:** Runs once per worker per disruption event. It scores each potential claim from 0 to 100. Claims scoring above 70 are flagged for manual review. Claims scoring above 90 are automatically rejected. The model checks GPS zone match against registered zone, whether the app was active before the trigger fired, whether the worker was moving (proving active delivery), account age, device fingerprint uniqueness across all accounts, and claim frequency over the past 4 weeks.
 
 ### Ravi's Fraud Check
 
@@ -438,16 +438,16 @@ Even if a sophisticated attacker defeats all three location signals, coordinated
 
 This layer analyzes the following signals:
 
-**Pre-disruption app activity baseline** :
+- **Pre-disruption app activity baseline** :
 Trigr's existing fraud checker already verifies whether the app was active before a trigger fires. The upgraded version checks the *pattern*: a genuine delivery worker has irregular, movement-heavy app sessions throughout the day. A fraudulent account that opened Trigr for the first time three minutes before a trigger fires, with no prior week-long session history, is anomalous even if the GPS looks clean.
 
-**Device motion sensor data** :
+- **Device motion sensor data** :
 Delivery workers in the field are moving. A smartphone's accelerometer and gyroscope produce continuous micro-vibration data consistent with riding a two-wheeler or walking. The browser's `DeviceMotion` API exposes this data. A claimed-field worker with a flat, stationary sensor profile is a strong fraud indicator.
 
-**Synchronisation timing across accounts** :
+- **Synchronisation timing across accounts** :
 This is the syndicate's most damning signal. When 500 workers all submit their location verification ping within a narrow 90-second window of each other, all at the moment a trigger fires, the timestamps form an unnatural cluster. Genuine workers in the field open their apps at scattered times. Redis-cached timestamp histograms can detect this surge pattern in near real time and flag the entire cohort for review, not just individual accounts.
 
-**Claim velocity anomaly** :
+- **Claim velocity anomaly** :
 A zone that typically generates 5–10 claims per disruption event suddenly generates 500 simultaneous claims. The insurer dashboard's loss ratio monitor already tracks pool health in real time. When a single event produces a payout volume that exceeds 3 standard deviations from the zone's historical average, the entire event batch is paused and queued for audit before any payouts are released.
 
 ---
