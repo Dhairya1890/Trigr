@@ -4,6 +4,23 @@
 > Built for Guidewire DEVTrails Hackathon
 
 ---
+ 
+## Table of Contents
+ 
+- [The Problem](#the-problem)
+- [What is Trigr](#what-is-trigr)
+- [Who Trigr Serves](#who-trigr-serves)
+- [System Architecture](#system-architecture)
+- [Core Modules](#core-modules)
+- [Component 1 : Income and Pricing Engine](#component-1--income-and-pricing-engine)
+- [Component 2 : Disruption Detection Engine](#component-2--disruption-detection-engine)
+- [Component 3 : Intelligence Layer](#component-3--intelligence-layer)
+- [Component 4 : Roles and Visibility Platform](#component-4--roles-and-visibility-platform)
+- [Tech Stack](#tech-stack)
+- [Why Trigr Has a Future](#why-trigr-has-a-future)
+- [Adversarial Defense & Anti-Spoofing Strategy](#adversarial-defense--anti-spoofing-strategy)
+ 
+---
 
 ## The Problem
 
@@ -104,6 +121,82 @@ Trigr cannot access Swiggy or Zomato's internal payment systems. Instead, worker
 When Ravi signs up, his statement shows four weeks of Swiggy credits averaging Rs 4,500/week. His self-declaration matches. His verified baseline is set at Rs 4,500/week, giving a verified hourly rate of Rs 62.50 (Rs 4,500 divided by 72 working hours per week).
 
 If a worker declares significantly more than their statements show, the system uses the verified figure as the basis for all payouts. This prevents earnings inflation fraud.
+
+### Tiered Verification System
+
+Trigr uses three progressive verification tiers. A worker can start immediately at Tier 1 and upgrade at any time. Each tier unlocks a higher weekly coverage cap.
+
+| Tier | Method | Coverage Cap (upto) | How it works |
+|---|---|---|---|
+| Tier 1 : Self-declaration | Worker states their weekly earnings | Rs 2,000 / week | Lowest friction. Payout capped conservatively to account for unverified income. |
+| Tier 2 : UPI Identity Verified | Rs 1 penny drop to worker's UPI ID | Rs 3,500 / week | Confirms UPI is real, bank account exists, and worker controls it. |
+| Tier 3 : AA Consent | RBI Account Aggregator : live bank data | Rs 4,000 / week | Bank-sourced income data. Less document upload. No credential sharing. |
+
+The coverage cap increases with verification depth because Trigr's confidence in the income figure increases. A self-declared Rs 8,000/week cannot be confirmed, so the payout is capped at Rs 2,000 regardless. A bank-verified Rs 4,500/week via AA is the exact figure the bank holds, the cap can be trusted at Rs 4,500-5,000.
+
+Verification is an incentive, not a gate. Ravi can buy coverage on day one with just his UPI ID and a self-declared earning figure. He upgrades when he is ready.
+
+---
+
+### Tier 2 : Rs. 1 UPI Penny Drop Verification
+
+This is an established pattern in Indian fintech, used by lending platforms (KreditBee, MoneyTap), wallets, and investment apps for KYC. Trigr borrows it for identity and bank account verification at onboarding.
+
+The idea is simple. Instead of asking for a document, Trigr sends Rs. 1 directly to the worker's UPI ID. If the transfer succeeds, three things are confirmed at once: the UPI ID is real, it is linked to an active bank account, and the person registering controls that account.
+
+**How it works for Ravi:**
+```
+Ravi enters his UPI ID: ravi.example@okexample
+        ↓
+Trigr triggers a Rs 1 transfer via Razorpay API (takes 3–5 seconds)
+        ↓
+Transfer succeeds → UPI ID confirmed, bank account confirmed real
+        ↓
+Ravi sees Rs 1 credited to his account → first money that moves is in his favour
+        ↓
+His UPI ID is now the verified payout destination for all future claims
+        ↓
+Coverage cap upgrades: Rs 2,000 - Rs 3,500 per week
+```
+
+Trigr absorbs the Rs. 1 as a KYC cost. At scale, verifying 10,000 workers costs Rs 10,000, a negligible expense relative to the fraud it prevents. The worker receiving Rs. 1 is also deliberate: it is a trust signal. The first financial interaction Ravi has with Trigr is Trigr paying him, not the other way around.
+
+---
+
+### Tier 3 : RBI Account Aggregator (AA) Framework
+
+The RBI-regulated financial data infrastructure, allowing a person to consent inorder to share their bank transaction data with a licensed platform: securely, in real time, without sharing login credentials or uploading any document.
+
+Think of it as a consent router. Ravi tells his bank: "share my last 3 months of transactions with Trigr." His bank sends the data directly. Trigr never sees his banking password. Ravi never uploads a PDF.
+
+**Three parties involved:**
+
+- **FIP (Financial Information Provider)** : Ravi's bank (such as HDFC, SBI, Kotak, Paytm Payments Bank). The institution holding the data.
+- **FIU (Financial Information User)** : Trigr, the platform consuming the consented data to calculate a verified income baseline.
+- **AA (Account Aggregator)** : The RBI-licensed consent router (such as Finvu, OneMoney, Setu, CAMS AA). Routes consent between FIP and FIU. Neither party can access data without the user's explicit approval.
+
+**How it works for Ravi:**
+```
+Ravi opts into AA consent during onboarding (completely voluntary)
+        ↓
+Trigr sends a consent request via AA (e.g. Setu) to Ravi's bank
+        ↓
+Ravi approves on his bank's app: one tap, no credentials shared
+        ↓
+Bank sends 3 months of transaction history to Trigr via the AA
+        ↓
+Trigr parses Swiggy credits: Rs 4,200 / Rs 4,800 / Rs 4,600 / Rs 4,400
+        ↓
+Verified average: Rs 4,500/week, directly from the bank, not from Ravi
+        ↓
+Coverage cap upgrades: Rs 3,500 - Rs 5,000 per week
+        ↓
+Premium is now calculated on a bank-verified figure, not a self-reported one
+```
+
+For Ravi, this means higher coverage at a premium that reflects his actual earnings. For Trigr, it means earnings inflation fraud is structurally impossible at this tier. The income figure used for payout calculation is the same figure the bank holds.
+
+> **Note:** Live AA integration requires FIU registration with RBI. For this platform, the AA framework is included as a planned fintech layer, the architecture is designed to support it and the consent flow can be demonstrated via any AA sandbox (Setu, Finvu, OneMoney) when required in later phases.
 
 ### Risk Scoring
 
@@ -299,7 +392,6 @@ Parametric insurance removes the friction that has historically kept insurance a
 
 ## Adversarial Defense & Anti-Spoofing Strategy
 
----
 
 ### Understanding the Threat
 
@@ -323,13 +415,13 @@ We propose a multi-layered approach structured across two independent detection 
 
 Instead of trusting a single GPS coordinate, Trigr verifies location across three independent signals simultaneously.
 
-**1. GPS coordinate**
+**1. GPS coordinate** :
 The standard reported location. Fakeable with common spoofing apps and treated as the least trusted signal in isolation.
 
-**2. Cell tower triangulation**
+**2. Cell tower triangulation** :
 The browser's `navigator.connection` and IP geolocation reveal which cell tower sector the device is actually registered to. A device claiming to be in Dharavi but registered to a cell tower in Andheri West or Thane creates an immediate conflict. Cell tower data is managed by the carrier, not the device OS, and cannot be spoofed by a user-space application.
 
-**3. Wi-Fi BSSID fingerprinting**
+**3. Wi-Fi BSSID fingerprinting** :
 When a user accesses Trigr via a mobile browser, the network they are connected to anchors their real location. A device connected to a home Wi-Fi network in Goregaon while claiming GPS coordinates in Dharavi produces a three-way mismatch.
 
 **The rule:** All three signals must place the worker within the claimed disruption zone, or the claim is flagged. If GPS reports one location while cell tower and Wi-Fi both report a different area, the GPS coordinate is treated as unreliable and the claim is held automatically.
@@ -344,23 +436,23 @@ Even if a sophisticated attacker defeats all three location signals, coordinated
 
 This layer analyzes the following signals:
 
-**Pre-disruption app activity baseline**
+**Pre-disruption app activity baseline** :
 Trigr's existing fraud checker already verifies whether the app was active before a trigger fires. The upgraded version checks the *pattern*: a genuine delivery worker has irregular, movement-heavy app sessions throughout the day. A fraudulent account that opened Trigr for the first time three minutes before a trigger fires, with no prior week-long session history, is anomalous even if the GPS looks clean.
 
-**Device motion sensor data**
+**Device motion sensor data** :
 Delivery workers in the field are moving. A smartphone's accelerometer and gyroscope produce continuous micro-vibration data consistent with riding a two-wheeler or walking. The browser's `DeviceMotion` API exposes this data. A claimed-field worker with a flat, stationary sensor profile is a strong fraud indicator.
 
-**Synchronisation timing across accounts**
+**Synchronisation timing across accounts** :
 This is the syndicate's most damning signal. When 500 workers all submit their location verification ping within a narrow 90-second window of each other, all at the moment a trigger fires, the timestamps form an unnatural cluster. Genuine workers in the field open their apps at scattered times. Redis-cached timestamp histograms can detect this surge pattern in near real time and flag the entire cohort for review, not just individual accounts.
 
-**Claim velocity anomaly**
+**Claim velocity anomaly** :
 A zone that typically generates 5–10 claims per disruption event suddenly generates 500 simultaneous claims. The insurer dashboard's loss ratio monitor already tracks pool health in real time. When a single event produces a payout volume that exceeds 3 standard deviations from the zone's historical average, the entire event batch is paused and queued for audit before any payouts are released.
 
 ---
 
-#### Layer 3  The Coordination Network Signal (Telegram Group Detection)
+#### Layer 3: The Coordination Network Signal (Telegram Group Detection)
 
-**UPI destination clustering**
+**UPI destination clustering** :
 If a disproportionate number of new accounts have UPI IDs resolving to the same bank branch or registered mobile number pattern, this is flagged
 
 ### The UX Balance: Protecting Genuine Workers
@@ -382,4 +474,5 @@ Trigr resolves this with a **tiered response model**, not a binary approve/rejec
 
 **On Tier 4:** The worker receives: *"Your claim could not be verified. If you believe this is an error, contact support with your delivery platform's trip log for that day."* The delivery platform trip log is the one data source the syndicate cannot fake. If Ravi actually worked, Swiggy's records prove it.
 
-**The principle:** the burden of extended review falls on ambiguous cases, not on confirmed clean ones. A real worker in bad weather may wait a few hours. A syndicate member is rejected. A confirmed fraud account is suspended. The payout pool is protected while the 847 legitimate workers in Dharavi still get paid the same day.
+
+**The principle:** The burden of extended review falls on ambiguous cases, not on confirmed clean ones. A real worker in bad weather may wait a few hours. A syndicate member is rejected. A confirmed fraud account is suspended. The payout pool is protected while the 847 legitimate workers in Dharavi still get paid the same day.
