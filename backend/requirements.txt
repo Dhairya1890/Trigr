@@ -1,0 +1,10 @@
+apscheduler==3.10.4
+fastapi==0.115.12
+httpx==0.28.1
+pandas==2.2.3
+pydantic[email]==2.11.3
+python-dotenv==1.1.0
+scikit-learn==1.6.1
+supabase==2.15.0
+uvicorn[standard]==0.34.0
+

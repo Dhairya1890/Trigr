@@ -1,0 +1,16 @@
+{
+  "name": "trigr",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "backend:dev": "python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:install": "python -m pip install --user -r backend/requirements.txt",
+    "seed": "python seed.py"
+  }
+}
