@@ -2,11 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Light mode (default) ── */
 :root {
   color-scheme: light;
+
+  --color-primary: #006591;
+  --color-primary-container: #0ea5e9;
+  --color-surface: #f9f9f9;
+  --color-surface-low: #f3f3f3;
+  --color-surface-lowest: #ffffff;
+  --color-surface-container: #eeeeee;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #3e4850;
+  --color-outline: #6e7881;
+  --color-outline-variant: #bec8d2;
+  --color-tertiary-container: #d88a00;
+  --color-error: #ba1a1a;
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-blur: blur(12px);
 }
 
-body {
-  @apply bg-white text-ink antialiased;
+/* ── Dark mode ── */
+.dark {
+  color-scheme: dark;
+
+  --color-primary: #89ceff;
+  --color-primary-container: #004c6e;
+  --color-surface: #111315;
+  --color-surface-low: #191b1d;
+  --color-surface-lowest: #0d0f11;
+  --color-surface-container: #1e2022;
+  --color-on-surface: #e2e2e2;
+  --color-on-surface-variant: #bec8d2;
+  --color-outline: #8a949d;
+  --color-outline-variant: #3e4850;
+  --color-tertiary-container: #ffb95f;
+  --color-error: #ffb4ab;
+
+  --glass-bg: rgba(17, 19, 21, 0.8);
+  --glass-blur: blur(12px);
 }
 
+/* ── Base typography ── */
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+/* ── Glass header ── */
+.glass-header {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* ── Marquee animations ── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee { animation: marquee 40s linear infinite; }
+.animate-marquee-reverse { animation: marquee-reverse 40s linear infinite; }
+
+/* ── Fade-up reveal ── */
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.5s ease-out forwards; }
+
+/* ── Currency display ── */
+.font-currency {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tab content utility ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── Scrollbar polish ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 9999px; }
+
+/* ── Focus ring ── */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-container/40 focus:ring-offset-2;
+  }
+}

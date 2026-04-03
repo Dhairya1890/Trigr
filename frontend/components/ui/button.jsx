@@ -3,36 +3,55 @@ import { cva } from "class-variance-authority";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "bg-brand text-white hover:opacity-90",
-        ghost: "bg-transparent text-ink hover:bg-surface",
-        outline: "border border-gray-200 bg-white text-ink hover:bg-surface"
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3",
-        lg: "h-11 px-6"
-      }
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default"
-    }
-  }
-);
-
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export function Button({ className, variant, size, asChild = false, ...props }) {
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 font-headline font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary-container/40 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary-container text-white rounded-lg shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95",
+        ghost:
+          "border border-secondary text-secondary rounded-lg hover:bg-secondary/5",
+        outline:
+          "border border-outline-variant text-on-surface rounded-lg hover:bg-surface-container-low",
+        danger:
+          "bg-error text-white rounded-lg hover:opacity-90",
+        success:
+          "bg-success text-white rounded-lg hover:opacity-90",
+      },
+      size: {
+        default: "h-10 px-5 py-2",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-12 px-8 py-3 text-base",
+        xl: "h-14 px-10 py-4 text-lg font-extrabold",
+        icon: "h-9 w-9 p-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+export function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}) {
   const Comp = asChild ? Slot : "button";
-  return <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
 }
 
 export { buttonVariants };
-
