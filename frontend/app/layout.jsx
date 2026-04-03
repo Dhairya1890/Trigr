@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import ThemeProvider from "@/components/shared/ThemeProvider";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body className="bg-surface font-body text-on-surface antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

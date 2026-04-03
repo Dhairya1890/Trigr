@@ -45,25 +45,25 @@ export default function RegisterEarningsPage() {
             <CardContent className="p-8 space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Full Name</label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Ravi Kumar" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="Ravi Kumar" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Phone Number</label>
-                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Weekly Earnings (₹)</label>
                 <div className="relative">
                   <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-outline" />
-                  <input type="number" value={earnings} onChange={e => setEarnings(e.target.value)} placeholder="4500" className="w-full pl-9 pr-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                  <input type="number" value={earnings} onChange={e => setEarnings(e.target.value)} placeholder="4500" className="w-full pl-9 pr-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">UPI ID</label>
-                <input value={upi} onChange={e => setUpi(e.target.value)} placeholder="ravi.kumar@okaxis" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                <input value={upi} onChange={e => setUpi(e.target.value)} placeholder="ravi.kumar@okaxis" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
               </div>
 
               <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border-l-4 border-primary-container">

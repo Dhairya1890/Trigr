@@ -71,19 +71,35 @@
   color-scheme: dark;
 
   --primary: 205 100% 77%;
-  --primary-container: 199 100% 22%;
+  --primary-container: 199 89% 48%; /* Vibrant highlight instead of #004d70 */
   --on-primary: 198 100% 28%;
-  --on-primary-container: 208 100% 90%;
+  --on-primary-container: 199 100% 12%;
   
+  --primary-fixed: 208 100% 90%;
+  --primary-fixed-dim: 205 100% 77%;
+  --on-primary-fixed: 202 100% 90%; /* Bright logo and fixed text in dark mode */
+  --on-primary-fixed-variant: 205 100% 77%;
+  --inverse-primary: 198 100% 28%;
+
   --secondary: 227 60% 83%;
   --on-secondary: 221 29% 25%;
   --secondary-container: 224 29% 31%;
   --on-secondary-container: 225 100% 93%;
 
+  --secondary-fixed: 225 100% 93%;
+  --secondary-fixed-dim: 227 60% 83%;
+  --on-secondary-fixed: 221 69% 13%;
+  --on-secondary-fixed-variant: 224 29% 31%;
+
   --tertiary: 34 100% 69%;
   --on-tertiary: 37 100% 20%;
   --tertiary-container: 37 100% 20%;
   --on-tertiary-container: 32 100% 86%;
+
+  --tertiary-fixed: 32 100% 86%;
+  --tertiary-fixed-dim: 34 100% 69%;
+  --on-tertiary-fixed: 33 100% 8%;
+  --on-tertiary-fixed-variant: 37 100% 20%;
 
   --error: 6 100% 84%;
   --on-error: 0 100% 21%;
@@ -167,7 +183,7 @@
 /* ── Scrollbar polish ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 9999px; }
+::-webkit-scrollbar-thumb { background: hsl(var(--outline-variant)); border-radius: 9999px; }
 
 /* ── Focus ring ── */
 @layer utilities {

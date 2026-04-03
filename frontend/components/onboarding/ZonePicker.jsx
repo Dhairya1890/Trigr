@@ -18,11 +18,11 @@ export default function ZonePicker({ city, zone, onCityChange, onZoneChange }) {
         <select
           value={city}
           onChange={(e) => { onCityChange(e.target.value); onZoneChange(""); }}
-          className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm"
+          className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface"
         >
-          <option value="">Select city</option>
+          <option value="" className="bg-surface text-on-surface">Select city</option>
           {cities.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c} className="bg-surface text-on-surface">{c}</option>
           ))}
         </select>
       </div>
@@ -32,11 +32,11 @@ export default function ZonePicker({ city, zone, onCityChange, onZoneChange }) {
           value={zone}
           onChange={(e) => onZoneChange(e.target.value)}
           disabled={!city}
-          className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm disabled:opacity-50"
+          className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm disabled:opacity-50 text-on-surface"
         >
-          <option value="">Select zone</option>
+          <option value="" className="bg-surface text-on-surface">Select zone</option>
           {zones.map((z) => (
-            <option key={z} value={z}>{z}</option>
+            <option key={z} value={z} className="bg-surface text-on-surface">{z}</option>
           ))}
         </select>
       </div>

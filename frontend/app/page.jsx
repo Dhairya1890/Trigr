@@ -21,6 +21,7 @@ import {
   Building2,
   BarChart4,
   ShoppingBasket,
+  ChevronDown,
 } from "lucide-react";
 
 /* ── Persona tab data ── */
@@ -163,6 +164,53 @@ const caseStudies = [
       '"During the November smog, I couldn\'t risk my health. Trigr verified the AQI levels in Gurgaon and covered my missed days."',
   },
 ];
+
+const faqs = [
+  {
+    question: "How do payouts work without a claim form?",
+    answer: "Trigr uses parametric triggers. When verified weather or city data (like 50mm+ rain in 3 hours) hits your specific zone, a payout is automatically calculated based on your shift overlap and sent directly to your UPI ID.",
+  },
+  {
+    question: "How are disruptions detected exactly?",
+    answer: "We poll high-reliability APIs (OpenWeatherMap, OpenAQ) every 15 minutes. For social disruptions like curfews or strikes, we use news sentiment analysis and official government feeds to verify the event before triggering payouts.",
+  },
+  {
+    question: "What documents do I need to register?",
+    answer: "Just your Phone Number and UPI ID for basic coverage. For higher coverage caps, you can optionally share bank statements via the RBI Account Aggregator framework to verify your platform earnings.",
+  },
+  {
+    question: "Is the coverage instant after I sign up?",
+    answer: "Once you register and pay your first weekly premium, your coverage is active for the following week starting Monday at 12:00 AM. Pricing is recalculated every Monday based on seasonal risk factors.",
+  },
+  {
+    question: "What happens if my payout is flagged for review?",
+    answer: "Our ML fraud engine cross-references GPS logs to ensure you were actually active in the affected zone. If a flag is raised, a human reviewer evaluates the case within 4 hours to ensure fair and accurate payouts.",
+  },
+];
+
+function FAQItem({ question, answer }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-outline-variant/10">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-6 flex justify-between items-center text-left hover:text-primary transition-colors focus-ring rounded-lg px-2"
+      >
+        <span className="font-headline font-bold text-lg text-on-surface">
+          {question}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-outline transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 pb-6 opacity-100" : "max-h-0 opacity-0"}`}
+      >
+        <p className="text-on-surface-variant leading-relaxed px-2">{answer}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState("partner");
@@ -457,6 +505,25 @@ export default function LandingPage() {
           </div>
         </Section>
 
+        {/* ── FAQ ── */}
+        <Section id="faq">
+          <div className="max-w-3xl mx-auto space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-3xl md:text-4xl font-headline font-extrabold text-on-surface">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-on-surface-variant">
+                Everything you need to know about Trigr&apos;s automated coverage.
+              </p>
+            </div>
+            <div className="bg-surface-container-low/30 rounded-2xl p-4 md:p-8 border border-outline-variant/10">
+              {faqs.map((faq, i) => (
+                <FAQItem key={i} {...faq} />
+              ))}
+            </div>
+          </div>
+        </Section>
+
         {/* ── Footer ── */}
         <footer className="bg-surface-container-lowest pt-20 pb-10 border-t border-outline-variant/20">
           <div className="max-w-shell mx-auto px-6">
@@ -512,7 +579,7 @@ export default function LandingPage() {
                 </p>
                 <div className="flex gap-2">
                   <input
-                    className="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all bg-transparent"
+                    className="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all bg-surface text-on-surface"
                     placeholder="Email address"
                     type="email"
                   />

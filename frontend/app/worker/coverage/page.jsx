@@ -10,6 +10,18 @@ export default function WorkerCoveragePage() {
         <p className="text-sm text-on-surface-variant">Higher verification = higher coverage cap.</p>
       </div>
 
+      <div className="p-4 rounded-xl bg-primary-container/10 border border-primary-container/20 flex gap-4 items-start shadow-sm">
+        <Info className="w-5 h-5 text-primary-container shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-primary-container tracking-tight">Regulatory Phase: Pilot</p>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            Trigr is currently in an active pilot phase. Full production rollout depends on local licensing 
+            and regulatory enablement in your specific jurisdiction. This platform is for demonstration 
+            purposes as part of the Guidewire DEVTrails hackathon.
+          </p>
+        </div>
+      </div>
+
       <CoverageTierCard currentTier={2} />
 
       <Card>

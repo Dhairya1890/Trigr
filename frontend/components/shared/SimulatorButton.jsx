@@ -111,9 +111,9 @@ export default function SimulatorButton() {
                   <select 
                     value={selectedZone}
                     onChange={(e) => setSelectedZone(e.target.value)}
-                    className="w-full bg-surface-container border border-outline-variant/30 rounded-lg p-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary-container"
+                    className="w-full bg-surface border border-outline-variant/30 rounded-lg p-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary-container text-on-surface"
                   >
-                    {zones.map(z => <option key={z} value={z}>{z}</option>)}
+                    {zones.map(z => <option key={z} value={z} className="bg-surface text-on-surface">{z}</option>)}
                   </select>
                 </div>
 

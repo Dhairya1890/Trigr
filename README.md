@@ -1,14 +1,15 @@
 # Trigr
-### AI-Enabled Parametric Income Insurance for Gig Economy Delivery Workers
+
+## AI-Enabled Parametric Income Insurance for Gig Economy Delivery Workers
 
 > Built for Guidewire DEVTrails Hackathon
 
-Video URL -
+Video URL - [Coming Soon]
 
 ---
- 
+
 ## Table of Contents
- 
+
 - [The Problem](#the-problem)
 - [What is Trigr](#what-is-trigr)
 - [Who Trigr Serves](#who-trigr-serves)
@@ -21,16 +22,16 @@ Video URL -
 - [Tech Stack](#tech-stack)
 - [Why Trigr Has a Future](#why-trigr-has-a-future)
 - [Adversarial Defense & Anti-Spoofing Strategy](#adversarial-defense--anti-spoofing-strategy)
- 
+
 ---
 
 ## The Problem
 
-India has over 12 million platform-based delivery workers across food, grocery, and e-commerce platforms. These workers operate without any income safety net. When external disruptions hit heavy rain, severe pollution, curfews, or local strikes, they simply stop earning. No work. No pay. No protection.
+India has over 12 million platform-based delivery workers across food, grocery, and e-commerce platforms. These workers operate without any income safety net. When external disruptions hit — heavy rain, severe pollution, curfews, or local strikes — they simply stop earning. No work. No pay. No protection.
 
 The scale of this problem is significant.
 
-```
+```text
 INCOME LOSS DURING EXTERNAL DISRUPTIONS, INDIAN GIG WORKERS
 (Estimated monthly average across high-disruption cities)
 
@@ -52,7 +53,7 @@ https://www.niti.gov.in/sites/default/files/2022-06/25th_June_Final_Report_27062
 
 ![Disruption-Driven Income Loss Across Seasons](img/disruption_chart.png)
 
-Meet **Ravi**. He is a delivery partner in Dharavi, Mumbai. He earns approximately Rs 4,500 a week working 10am to 10pm, six days a week. In July 2024, three consecutive days of heavy rain meant he could not work. He lost roughly Rs 2,700 that week with no recourse, no claim to file, and no platform support. Ravi's story is not unusual, it is the norm for millions of workers every monsoon season.
+Meet **Ravi**. He is a delivery partner in Dharavi, Mumbai. He earns approximately Rs 4,500 a week working 10am to 10pm, six days a week. In July 2024, three consecutive days of heavy rain meant he could not work. He lost roughly Rs 2,700 that week with no recourse, no claim to file, and no platform support. Ravi's story is not unusual — it is the norm for millions of workers every monsoon season.
 
 **No existing product combines all of the following:** Indian delivery worker targeting, weekly pricing, AI fraud detection, social disruption triggers, and automated UPI payouts. Trigr is built to fill this gap entirely.
 
@@ -60,20 +61,20 @@ Meet **Ravi**. He is a delivery partner in Dharavi, Mumbai. He earns approximate
 
 ## What is Trigr
 
-Trigr is a parametric income insurance platform for platform-based delivery workers in India. Workers pay a small weekly premium. When a verified external disruption occurs in their zone a flood, a severe AQI event, a curfew or a local strike, Trigr detects it automatically, calculates the income lost during their shift, and sends a payout directly to their UPI. No claim filing. No paperwork. No waiting.
+Trigr is a parametric income insurance platform for platform-based delivery workers in India. Workers pay a small weekly premium. When a verified external disruption occurs in their zone — a flood, a severe AQI event, a curfew or a local strike — Trigr detects it automatically, calculates the income lost during their shift, and sends a payout directly to their UPI. No claim filing. No paperwork. No waiting.
 
 **What Trigr covers:** Lost working hours and income caused by verified external disruptions.
 
 **What Trigr strictly excludes:** Health, life, accidents, and vehicle repairs.
 
-**Platform choice: Web Application.** A web app was chosen over mobile for the following reasons. It is accessible on any device without installation, easier to demonstrate to judges and stakeholders, and allows richer dashboard interfaces for all three user roles. Delivery workers in India routinely access financial services via mobile browsers no app download required.
+**Platform choice: Web Application.** A web app was chosen over mobile for the following reasons: it is accessible on any device without installation, easier to demonstrate to judges and stakeholders, and allows richer dashboard interfaces for all three user roles. Delivery workers in India routinely access financial services via mobile browsers — no app download required.
 
 ---
 
 ## Who Trigr Serves
 
 | Persona | Platforms | Primary Disruption Risk |
-|---|---|---|
+| :--- | :--- | :--- |
 | Food Delivery Partner | Swiggy, Zomato | Heavy rain, floods, curfews |
 | Grocery / Q-Commerce Partner | Blinkit, Instamart, Zepto | Severe AQI, rain, zone closures |
 
@@ -82,23 +83,19 @@ Ravi falls into the first category. He is the primary persona used throughout th
 ---
 
 ## System Architecture
+
 ![System Architecture](img/arch_system.png)
 
 ---
 
 ## Core Modules
 
-**Worker Onboarding and Risk Profiling** : Workers register with their platform, city, zone, shift hours, and earnings. An AI risk scorer assigns them a risk tier which feeds directly into their premium.
-
-**Income and Pricing Engine** : Calculates a weekly premium based on verified earnings, risk tier, and current conditions. Recalculates every Monday. Detailed below.
-
-**Disruption Detection Engine** : Polls external APIs every 15 minutes and fires automated triggers when thresholds are breached. Detailed below.
-
-**Intelligence Layer** : Three ML models handle risk scoring, weekly repricing, and fraud detection across the full lifecycle. Detailed below.
-
-**Payout Engine** : On a clean trigger and clean fraud check, calculates the exact income lost during the disruption window and initiates a UPI transfer automatically.
-
-**Role-Based Dashboards** : Three separate interfaces for workers, insurers, and administrators. Detailed below.
+- **Worker Onboarding and Risk Profiling**: Workers register with their platform, city, zone, shift hours, and earnings. An AI risk scorer assigns them a risk tier which feeds directly into their premium.
+- **Income and Pricing Engine**: Calculates a weekly premium based on verified earnings, risk tier, and current conditions. Recalculates every Monday.
+- **Disruption Detection Engine**: Polls external APIs every 15 minutes and fires automated triggers when thresholds are breached.
+- **Intelligence Layer**: Three ML models handle risk scoring, weekly repricing, and fraud detection across the full lifecycle.
+- **Payout Engine**: On a clean trigger and clean fraud check, calculates the exact income lost during the disruption window and initiates a UPI transfer automatically.
+- **Role-Based Dashboards**: Three separate interfaces for workers, insurers, and administrators.
 
 ---
 
@@ -129,12 +126,12 @@ If a worker declares significantly more than their statements show, the system u
 Trigr uses three progressive verification tiers. A worker can start immediately at Tier 1 and upgrade at any time. Each tier unlocks a higher weekly coverage cap.
 
 | Tier | Method | Coverage Cap (upto) | How it works |
-|---|---|---|---|
-| Tier 1 : Self-declaration | Worker states their weekly earnings | Rs 2,000 / week | Lowest friction. Payout capped conservatively to account for unverified income. |
-| Tier 2 : UPI Identity Verified | Rs 1 penny drop to worker's UPI ID | Rs 3,500 / week | Confirms UPI is real, bank account exists, and worker controls it. |
-| Tier 3 : AA Consent | RBI Account Aggregator : live bank data | Rs 4,000 / week | Bank-sourced income data. Less document upload. No credential sharing. |
+| :--- | :--- | :--- | :--- |
+| Tier 1: Self-declaration | Worker states their weekly earnings | Rs 2,000 / week | Lowest friction. Payout capped conservatively to account for unverified income. |
+| Tier 2: UPI Identity Verified | Rs 1 penny drop to worker's UPI ID | Rs 3,500 / week | Confirms UPI is real, bank account exists, and worker controls it. |
+| Tier 3: AA Consent | RBI Account Aggregator: live bank data | Rs 4,000 / week | Bank-sourced income data. Less document upload. No credential sharing. |
 
-The coverage cap increases with verification depth because Trigr's confidence in the income figure increases. A self-declared Rs 8,000/week cannot be confirmed, so the payout is capped at Rs 2,000 regardless. A bank-verified Rs 4,500/week via AA is the exact figure the bank holds, the cap can be trusted at Rs 4,500-5,000.
+The coverage cap increases with verification depth because Trigr's confidence in the income figure increases. A self-declared Rs 8,000/week cannot be confirmed, so the payout is capped at Rs 2,000 regardless. A bank-verified Rs 4,500/week via AA is the exact figure the bank holds — the cap can be trusted at Rs 4,500-5,000.
 
 Verification is an incentive, not a gate. Ravi can buy coverage on day one with just his UPI ID and a self-declared earning figure. He upgrades when he is ready.
 
@@ -147,7 +144,8 @@ This is an established pattern in Indian fintech, used by lending platforms (Kre
 The idea is simple. Instead of asking for a document, Trigr sends Rs. 1 directly to the worker's UPI ID. If the transfer succeeds, three things are confirmed at once: the UPI ID is real, it is linked to an active bank account, and the person registering controls that account.
 
 **How it works for Ravi:**
-```
+
+```text
 Ravi enters his UPI ID: ravi.example@okexample
         ↓
 Trigr triggers a Rs 1 transfer via Razorpay API (takes 3–5 seconds)
@@ -161,24 +159,25 @@ His UPI ID is now the verified payout destination for all future claims
 Coverage cap upgrades: Rs 2,000 - Rs 3,500 per week
 ```
 
-Trigr absorbs the Rs. 1 as a KYC cost. At scale, verifying 10,000 workers costs Rs 10,000, a negligible expense relative to the fraud it prevents. The worker receiving Rs. 1 is also deliberate: it is a trust signal. The first financial interaction Ravi has with Trigr is Trigr paying him, not the other way around.
+Trigr absorbs the Rs. 1 as a KYC cost. At scale, verifying 10,000 workers costs Rs 10,000, a negligible expense relative to the fraud it prevents. The worker receiving Rs. 1 is also deliberate — it is a trust signal. The first financial interaction Ravi has with Trigr is Trigr paying him, not the other way around.
 
 ---
 
 ### Tier 3 : RBI Account Aggregator (AA) Framework
 
-The RBI-regulated financial data infrastructure, allowing a person to consent inorder to share their bank transaction data with a licensed platform: securely, in real time, without sharing login credentials or uploading any document.
+The RBI-regulated financial data infrastructure allows a person to consent in order to share their bank transaction data with a licensed platform: securely, in real time, without sharing login credentials or uploading any document.
 
 Think of it as a consent router. Ravi tells his bank: "share my last 3 months of transactions with Trigr." His bank sends the data directly. Trigr never sees his banking password. Ravi never uploads a PDF.
 
 **Three parties involved:**
 
-- **FIP (Financial Information Provider)** : Ravi's bank (such as HDFC, SBI, Kotak, Paytm Payments Bank). The institution holding the data.
-- **FIU (Financial Information User)** : Trigr, the platform consuming the consented data to calculate a verified income baseline.
-- **AA (Account Aggregator)** : The RBI-licensed consent router (such as Finvu, OneMoney, Setu, CAMS AA). Routes consent between FIP and FIU. Neither party can access data without the user's explicit approval.
+- **FIP (Financial Information Provider)**: Ravi's bank (such as HDFC, SBI, Kotak, Paytm Payments Bank). The institution holding the data.
+- **FIU (Financial Information User)**: Trigr, the platform consuming the consented data to calculate a verified income baseline.
+- **AA (Account Aggregator)**: The RBI-licensed consent router (such as Finvu, OneMoney, Setu, CAMS AA). Routes consent between FIP and FIU. Neither party can access data without the user's explicit approval.
 
 **How it works for Ravi:**
-```
+
+```text
 Ravi opts into AA consent during onboarding (completely voluntary)
         ↓
 Trigr sends a consent request via AA (e.g. Setu) to Ravi's bank
@@ -198,7 +197,8 @@ Premium is now calculated on a bank-verified figure, not a self-reported one
 
 For Ravi, this means higher coverage at a premium that reflects his actual earnings. For Trigr, it means earnings inflation fraud is structurally impossible at this tier. The income figure used for payout calculation is the same figure the bank holds.
 
-> **Note:** Live AA integration requires FIU registration with RBI. For this platform, the AA framework is included as a planned fintech layer, the architecture is designed to support it and the consent flow can be demonstrated via any AA sandbox (Setu, Finvu, OneMoney) when required in later phases.
+> [!NOTE]
+> Live AA integration requires FIU registration with RBI. For this platform, the AA framework is included as a planned fintech layer: the architecture is designed to support it and the consent flow can be demonstrated via any AA sandbox (Setu, Finvu, OneMoney) when required in later phases.
 
 ### Risk Scoring
 
@@ -214,7 +214,7 @@ Ravi scores 85 out of 100. He is in Dharavi (flood-prone zone), Mumbai (highest 
 
 ### Weekly Premium Calculation
 
-```
+```text
 Base rate: 2.2% of verified weekly earnings
 (Derived from a target 70% loss ratio adjusted for parametric efficiency)
 
@@ -229,25 +229,23 @@ Ravi's calculation:
 
 Every Monday, the system recalculates Ravi's premium for the coming week using the 7-day weather forecast, AQI trends, any upcoming events that raise curfew risk, and his claim history. If a disruption-free week is forecast, his premium adjusts down. If three heavy rain days are predicted, it adjusts up. Ravi is notified and chooses to renew or pause.
 
-### Variable Coverage : Why It Exists
+### Variable Coverage — Why It Exists
 
-Coverage is set at 70–80% of lost income rather than 100% for two reasons. First, partial coverage ensures workers still have a personal stake in working when conditions allow full replacement removes all incentive to continue working during marginal conditions. Second, parametric insurance triggers city-wide: when it rains heavily in Mumbai, all 847 workers in the affected zone claim simultaneously. The 20–25% self-retention is what keeps the payout pool solvent during these simultaneous events.
+Coverage is set at 70–80% of lost income rather than 100% for two reasons. First, partial coverage ensures workers still have a personal stake in working when conditions allow — full replacement removes all incentive to continue working during marginal conditions. Second, parametric insurance triggers city-wide: when it rains heavily in Mumbai, all 847 workers in the affected zone claim simultaneously. The 20–25% self-retention is what keeps the payout pool solvent during these simultaneous events.
 
 Ravi's High risk tier earns him 80% coverage, a higher rate than lower-risk tiers, because he pays a higher premium and faces more frequent disruptions. The extra coverage is the platform's acknowledgment of that.
 
 ### Edge Cases
 
-- **Ravi was not on shift during the disruption:** If the disruption window (say, 2am–5am) does not overlap with Ravi's shift (10am–10pm), his overlap is zero hours and his payout is Rs 0. The system only compensates for hours that would have been working hours.
-
-- **Two disruptions in one week:** Payouts accumulate against the weekly cap. If Ravi receives Rs 250 on Monday and Rs 300 on Thursday, both are paid. If a third event would push his total above Rs 3,600, the third payout is capped at the remaining balance.
-
-- **Disruption shorter than 60 minutes:** Brief rain events that resolve quickly do not qualify. A minimum 60-minute duration is required before a trigger fires, preventing micro-payouts from fleeting weather changes.
+- **Ravi was not on shift during the disruption**: If the disruption window (say, 2am–5am) does not overlap with Ravi's shift (10am–10pm), his overlap is zero hours and his payout is Rs 0. The system only compensates for hours that would have been working hours.
+- **Two disruptions in one week**: Payouts accumulate against the weekly cap. If Ravi receives Rs 250 on Monday and Rs 300 on Thursday, both are paid. If a third event would push his total above Rs 3,600, the third payout is capped at the remaining balance.
+- **Disruption shorter than 60 minutes**: Brief rain events that resolve quickly do not qualify. A minimum 60-minute duration is required before a trigger fires, preventing micro-payouts from fleeting weather changes.
 
 ---
 
 ## Component 2 : Disruption Detection Engine
 
-### What This Component Does
+### What Component 2 Does
 
 A parametric trigger is a pre-defined, objective, measurable threshold tied to an external data source. When the threshold is crossed, payouts are initiated automatically without any action from the worker. The trigger is tied to the event itself, not to the worker's experience of it. This is what makes the system fully automated and fraud-resistant at the event level.
 
@@ -255,19 +253,19 @@ A parametric trigger is a pre-defined, objective, measurable threshold tied to a
 
 **Environmental triggers** are sourced from weather and pollution APIs:
 
-- Heavy Rain: rainfall exceeding 50mm in a 3-hour window
-- Extreme Rain: rainfall exceeding 100mm in a 3-hour window
-- Flood Alert: active government flood warning for the zone
-- Severe AQI: air quality index above 300 (Hazardous) sustained for 4+ hours
-- Cyclone or Storm: wind speed above 80 km/h
-- Dense Fog: visibility below 50 metres for 2+ hours
+- **Heavy Rain**: rainfall exceeding 50mm in a 3-hour window
+- **Extreme Rain**: rainfall exceeding 100mm in a 3-hour window
+- **Flood Alert**: active government flood warning for the zone
+- **Severe AQI**: air quality index above 300 (Hazardous) sustained for 4+ hours
+- **Cyclone or Storm**: wind speed above 80 km/h
+- **Dense Fog**: visibility below 50 metres for 2+ hours
 
 **Social and civil triggers** are sourced from news and advisory APIs:
 
-- Curfew: confirmed via two independent news sources and government advisory
-- State or City Bandh: confirmed via news sentiment analysis and keyword scoring
-- Local Strike: zone-specific news combined with anomalous traffic data
-- Market or Zone Closure: official government notice
+- **Curfew**: confirmed via two independent news sources and government advisory
+- **State or City Bandh**: confirmed via news sentiment analysis and keyword scoring
+- **Local Strike**: zone-specific news combined with anomalous traffic data
+- **Market or Zone Closure**: official government notice
 
 Social triggers require a higher confidence threshold before firing, as a single ambiguous news article should not initiate mass payouts.
 
@@ -280,7 +278,7 @@ Social triggers require a higher confidence threshold before firing, as a single
 Not all triggers carry the same reliability. The system assigns a confidence score to each detected event:
 
 | Confidence | Score | Action |
-|---|---|---|
+| :--- | :--- | :--- |
 | High | 90–100 | Full automatic payout |
 | Medium | 70–89 | Automatic payout, flagged for audit |
 | Low | 50–69 | Held for manual review |
@@ -292,25 +290,23 @@ Weather triggers almost always score High because the data is numeric and source
 
 On Thursday July 17 at 2:00 PM, the scheduler polls OpenWeatherMap and receives a rainfall reading of 62.4mm for Mumbai in the last 3 hours. The threshold of 50mm is crossed. The Disruption Evaluator identifies Dharavi, Kurla, Sion, and Andheri East as affected zones based on their flood-risk classification. A query returns 847 workers with active policies in those zones, including Ravi.
 
-For Ravi, the system calculates that his shift runs until 10pm and the disruption window is 2pm to 7pm, 5 hours of overlap. His lost income is 5 hours × Rs 62.50 = Rs 312.50. His payout at 80% coverage is Rs 250. After a clean fraud check, Rs 250 is sent to his UPI automatically. He receives a notification on his dashboard. He did not file anything.
+For Ravi, the system calculates that his shift runs until 10pm and the disruption window is 2pm to 7pm — 5 hours of overlap. His lost income is 5 hours × Rs 62.50 = Rs 312.50. His payout at 80% coverage is Rs 250. After a clean fraud check, Rs 250 is sent to his UPI automatically. He receives a notification on his dashboard. He did not file anything.
 
 ---
 
 ## Component 3 : Intelligence Layer
 
-### What This Component Does
+### What Component 3 Does
 
 Three machine learning models operate across the full platform lifecycle. Each model is rule-weighted and fully explainable, meaning every decision can be traced back to specific input signals. This is intentional: explainability is essential for insurance fairness and for auditing disputed claims.
 
 ![Architecture Intelligence](img/arch_intelligence.png)
 
-### The Three Models :
+### The Three Models
 
-- **Risk Scorer:** Runs once when Ravi registers. It takes his city, zone type, platform, shift pattern, and the current season as inputs and outputs a risk score and tier. This tier sets his base premium multiplier and coverage percentage. When Ravi signs up in July in Dharavi, his score of 85 places him in the High tier immediately.
-
-- **Dynamic Premium Adjuster:** Runs every Monday morning for all workers with active or renewing policies. It takes the 7-day weather and AQI forecast, any known upcoming events, the city-wide loss ratio for the past 4 weeks, and the individual worker's claim history. It outputs an adjusted premium for the coming week. If Mumbai's forecast shows 3 heavy rain days in the coming week, Ravi's premium increases modestly. If he has gone 8 consecutive weeks without a claim, a loyalty factor reduces his premium slightly.
-
-- **Fraud Detector:** Runs once per worker per disruption event. It scores each potential claim from 0 to 100. Claims scoring above 70 are flagged for manual review. Claims scoring above 90 are automatically rejected. The model checks GPS zone match against registered zone, whether the app was active before the trigger fired, whether the worker was moving (proving active delivery), account age, device fingerprint uniqueness across all accounts, and claim frequency over the past 4 weeks.
+- **Risk Scorer**: Runs once when Ravi registers. It takes his city, zone type, platform, shift pattern, and the current season as inputs and outputs a risk score and tier. This tier sets his base premium multiplier and coverage percentage. When Ravi signs up in July in Dharavi, his score of 85 places him in the High tier immediately.
+- **Dynamic Premium Adjuster**: Runs every Monday morning for all workers with active or renewing policies. It takes the 7-day weather and AQI forecast, any known upcoming events, the city-wide loss ratio for the past 4 weeks, and the individual worker's claim history. It outputs an adjusted premium for the coming week. If Mumbai's forecast shows 3 heavy rain days in the coming week, Ravi's premium increases modestly. If he has gone 8 consecutive weeks without a claim, a loyalty factor reduces his premium slightly.
+- **Fraud Detector**: Runs once per worker per disruption event. It scores each potential claim from 0 to 100. Claims scoring above 70 are flagged for manual review. Claims scoring above 90 are automatically rejected. The model checks GPS zone match against registered zone, whether the app was active before the trigger fired, whether the worker was moving (proving active delivery), account age, device fingerprint uniqueness across all accounts, and claim frequency over the past 4 weeks.
 
 ### Ravi's Fraud Check
 
@@ -320,17 +316,17 @@ A worker who registered 2 days ago, whose GPS shows a different city, and whose 
 
 ### Model Evolution Path
 
-For the current build, all three models use rule-weighted scoring, which requires no historical training data and is immediately deployable. As the platform accumulates real claim outcomes, the models will transition to logistic regression, then to gradient boosting for premium prediction and Isolation Forest for fraud anomaly detection. The API interfaces remain identical across this evolution, the underlying model can be upgraded without changing any downstream code.
+For the current build, all three models use rule-weighted scoring, which requires no historical training data and is immediately deployable. As the platform accumulates real claim outcomes, the models will transition to logistic regression, then to gradient boosting for premium prediction and Isolation Forest for fraud anomaly detection. The API interfaces remain identical across this evolution — the underlying model can be upgraded without changing any downstream code.
 
 ---
 
 ## Component 4 : Roles and Visibility Platform
 
-### What This Component Does
+### What Component 4 Does
 
 Three role-based dashboards serve three different users. Each user sees only what is relevant to their role. Authentication is handled at both the application routing layer and the database policy layer, ensuring strict separation.
 
-```
+```text
 WORKER DASHBOARD     -  Ravi and other delivery partners
 INSURER DASHBOARD    -  Operations team monitoring platform health
 ADMIN PANEL          -  Internal team reviewing flagged claims
@@ -354,7 +350,7 @@ When the Mumbai rain event fires, the insurer dashboard updates in real time: *M
 
 ### Admin Panel
 
-The admin team sees only flagged claims, the fraud review queue. Each flagged claim shows the specific signals that fired, the raw evidence (GPS coordinates, app activity timestamps, account age), the fraud score, and the recommended verdict. A reviewer can approve, reject, or suspend the account directly from this view.
+The admin team sees only flagged claims — the fraud review queue. Each flagged claim shows the specific signals that fired, the raw evidence (GPS coordinates, app activity timestamps, account age), the fraud score, and the recommended verdict. A reviewer can approve, reject, or suspend the account directly from this view.
 
 The panel also surfaces fraud analytics: total claims processed, auto-approval rate, confirmed fraud cases, and estimated losses prevented by the fraud detection layer.
 
@@ -363,7 +359,7 @@ The panel also surfaces fraud analytics: total claims processed, auto-approval r
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| :--- | :--- |
 | Frontend | Next.js 14 + TailwindCSS + shadcn/ui |
 | Backend | FastAPI (Python) |
 | Primary Database | Supabase (PostgreSQL) |
@@ -374,9 +370,7 @@ The panel also surfaces fraud analytics: total claims processed, auto-approval r
 | Weather Data | OpenWeatherMap API |
 | AQI Data | OpenAQ API |
 | News and Social | NewsAPI |
-| Deployment | Vercel (frontend) + Railway|
-
-
+| Deployment | Vercel (frontend) + Railway |
 
 ---
 
@@ -384,7 +378,7 @@ The panel also surfaces fraud analytics: total claims processed, auto-approval r
 
 India's gig workforce is projected to reach 23.5 million workers by 2030 (NITI Aayog, 2022). Climate volatility is increasing the frequency and severity of weather disruptions across Indian cities every year. At the same time, UPI has made instant micro-payments to any worker in any city a solved infrastructure problem.
 
-The conditions that make Trigr viable, a large unprotected workforce, worsening external disruptions, and instant payment rails are all strengthening simultaneously.
+The conditions that make Trigr viable — a large unprotected workforce, worsening external disruptions, and instant payment rails — are all strengthening simultaneously.
 
 Ravi does not need a bank relationship, a broker, or a smartphone app. He needs a browser, a UPI ID, and Rs 131 a week. When the next flood hits Dharavi, he gets paid automatically while his competitors on unprotected platforms absorb the loss entirely.
 
@@ -394,7 +388,6 @@ Parametric insurance removes the friction that has historically kept insurance a
 
 ## Adversarial Defense & Anti-Spoofing Strategy
 
-
 ### Understanding the Threat
 
 The syndicate exploit is precise. GPS spoofing apps like Fake GPS and Lockito inject fake coordinates at the OS layer, making all apps on the device (including Trigr) believe the phone is somewhere it is not.
@@ -403,7 +396,7 @@ Since Trigr's existing fraud checker simply validates that a GPS coordinate fall
 
 The attack is also coordinated, meaning 500 workers are triggering simultaneously. This is actually the syndicate's biggest weakness: coordinated fraud leaves a statistical fingerprint that individual fraud cannot.
 
-**The key insight driving our defense:** GPS spoofing apps can only fake one signal. They cannot simultaneously fake every independent location signal on the device. While GPS can be manipulated at the app layer, a device's cell tower registration, IP geolocation, and Wi-Fi BSSID cannot be spoofed by a user-space application.
+**The key insight driving our defense**: GPS spoofing apps can only fake one signal. They cannot simultaneously fake every independent location signal on the device. While GPS can be manipulated at the app layer, a device's cell tower registration, IP geolocation, and Wi-Fi BSSID cannot be spoofed by a user-space application.
 
 ---
 
@@ -417,64 +410,43 @@ We propose a multi-layered approach structured across two independent detection 
 
 Instead of trusting a single GPS coordinate, Trigr verifies location across three independent signals simultaneously.
 
-**1. GPS coordinate** :
-The standard reported location. Fakeable with common spoofing apps and treated as the least trusted signal in isolation.
+1.  **GPS coordinate**: The standard reported location. Fakeable with common spoofing apps and treated as the least trusted signal in isolation.
+2.  **Cell tower triangulation**: The browser's `navigator.connection` and IP geolocation reveal which cell tower sector the device is actually registered to. A device claiming to be in Dharavi but registered to a cell tower in Andheri West or Thane creates an immediate conflict.
+3.  **Wi-Fi BSSID fingerprinting**: When a user accesses Trigr via a mobile browser, the network they are connected to anchors their real location. A device connected to a home Wi-Fi network in Goregaon while claiming GPS coordinates in Dharavi produces a three-way mismatch.
 
-**2. Cell tower triangulation** :
-The browser's `navigator.connection` and IP geolocation reveal which cell tower sector the device is actually registered to. A device claiming to be in Dharavi but registered to a cell tower in Andheri West or Thane creates an immediate conflict. Cell tower data is managed by the carrier, not the device OS, and cannot be spoofed by a user-space application.
+**The rule**: All three signals must place the worker within the claimed disruption zone, or the claim is flagged. If GPS reports one location while cell tower and Wi-Fi both report a different area, the GPS coordinate is treated as unreliable and the claim is held automatically.
 
-**3. Wi-Fi BSSID fingerprinting** :
-When a user accesses Trigr via a mobile browser, the network they are connected to anchors their real location. A device connected to a home Wi-Fi network in Goregaon while claiming GPS coordinates in Dharavi produces a three-way mismatch.
-
-**The rule:** All three signals must place the worker within the claimed disruption zone, or the claim is flagged. If GPS reports one location while cell tower and Wi-Fi both report a different area, the GPS coordinate is treated as unreliable and the claim is held automatically.
-
-> Note: Workers legitimately in the field with no Wi-Fi connection (which is common for delivery workers on mobile data) have the Wi-Fi signal marked as absent, not fraudulent. Only an active conflict (Wi-Fi present but contradicting GPS) triggers a flag.
+> [!NOTE]
+> Workers legitimately in the field with no Wi-Fi connection (which is common for delivery workers on mobile data) have the Wi-Fi signal marked as absent, not fraudulent. Only an active conflict (Wi-Fi present but contradicting GPS) triggers a flag.
 
 ---
 
 #### Layer 2: Behavioural and Temporal Signals
 
-Even if a sophisticated attacker defeats all three location signals, coordinated fraud rings produce behavioural anomalies that individual fraud cannot mimic. A group of data points that are individually unremarkable can, collectively, be anomalous. This is a hallmark of fraud rings.
+Even if a sophisticated attacker defeats all three location signals, coordinated fraud rings produce behavioural anomalies that individual fraud cannot mimic.
 
-This layer analyzes the following signals:
-
-- **Pre-disruption app activity baseline** :
-Trigr's existing fraud checker already verifies whether the app was active before a trigger fires. The upgraded version checks the *pattern*: a genuine delivery worker has irregular, movement-heavy app sessions throughout the day. A fraudulent account that opened Trigr for the first time three minutes before a trigger fires, with no prior week-long session history, is anomalous even if the GPS looks clean.
-
-- **Device motion sensor data** :
-Delivery workers in the field are moving. A smartphone's accelerometer and gyroscope produce continuous micro-vibration data consistent with riding a two-wheeler or walking. The browser's `DeviceMotion` API exposes this data. A claimed-field worker with a flat, stationary sensor profile is a strong fraud indicator.
-
-- **Synchronisation timing across accounts** :
-This is the syndicate's most damning signal. When 500 workers all submit their location verification ping within a narrow 90-second window of each other, all at the moment a trigger fires, the timestamps form an unnatural cluster. Genuine workers in the field open their apps at scattered times. Redis-cached timestamp histograms can detect this surge pattern in near real time and flag the entire cohort for review, not just individual accounts.
-
-- **Claim velocity anomaly** :
-A zone that typically generates 5–10 claims per disruption event suddenly generates 500 simultaneous claims. The insurer dashboard's loss ratio monitor already tracks pool health in real time. When a single event produces a payout volume that exceeds 3 standard deviations from the zone's historical average, the entire event batch is paused and queued for audit before any payouts are released.
+- **Pre-disruption app activity baseline**: Trigr's existing fraud checker already verifies whether the app was active before a trigger fires. The upgraded version checks the *pattern*: a genuine delivery worker has irregular, movement-heavy app sessions throughout the day.
+- **Device motion sensor data**: Delivery workers in the field are moving. A smartphone's accelerometer and gyroscope produce continuous micro-vibration data consistent with riding a two-wheelers or walking.
+- **Synchronisation timing across accounts**: When 500 workers all submit their location verification ping within a narrow 90-second window of each other, the timestamps form an unnatural cluster. Genuine workers in the field open their apps at scattered times.
+- **Claim velocity anomaly**: A zone that typically generates 5–10 claims per disruption event suddenly generates 500 simultaneous claims. When a single event produces a payout volume that exceeds 3 standard deviations from the zone's historical average, the entire event batch is paused.
 
 ---
 
-#### Layer 3: The Coordination Network Signal (Telegram Group Detection)
+#### Layer 3: The Coordination Network Signal
 
-**UPI destination clustering** :
-If a disproportionate number of new accounts have UPI IDs resolving to the same bank branch or registered mobile number pattern, this is flagged
+**UPI destination clustering**: If a disproportionate number of new accounts have UPI IDs resolving to the same bank branch or registered mobile number pattern, this is flagged.
 
 ### The UX Balance: Protecting Genuine Workers
 
-The critical design challenge is this: during a real monsoon event, a genuine worker like Ravi may have weak GPS signal, no Wi-Fi, and limited connectivity. These are exactly the conditions that make signal consensus harder. A system that auto-rejects any multi-signal conflict would penalise honest workers in bad weather.
+The critical design challenge is this: during a real monsoon event, a genuine worker like Ravi may have weak GPS signal, no Wi-Fi, and limited connectivity.
 
-Trigr resolves this with a **tiered response model**, not a binary approve/reject.
+Trigr resolves this with a **tiered response model**:
 
 | Tier | Fraud Score | Action |
-|---|---|---|
+| :--- | :--- | :--- |
 | **Tier 1: Clean** | 0-30 | All signals consistent. Auto-approve. Payout in under 3 minutes. |
-| **Tier 2: Soft Flag** | 31-60 | One signal conflict, but behavioural signals are clean. Payout approved but delayed by 2 hours and tagged for post-event audit. Ravi gets his money the same day. |
-| **Tier 3: Hard Flag** | 61-85 | Multiple signal conflicts, or part of a statistical cluster. Payout is held, not rejected. Worker is notified and a human reviewer evaluates the case within 4 hours. |
-| **Tier 4: Auto-Reject** | 86-100 | Three or more hard conflicts, plus device fingerprint linked to a confirmed fraud network, plus synchronised timing. Payout is rejected and the account is suspended pending investigation. |
+| **Tier 2: Soft Flag** | 31-60 | One signal conflict, behavioural signals clean. Payout approved but delayed for audit. |
+| **Tier 3: Hard Flag** | 61-85 | Multiple signal conflicts. Payout is held, not rejected. Worker notified for review. |
+| **Tier 4: Auto-Reject** | 86-100 | Multiple hard conflicts + device fingerprint link. Payout rejected, account suspended. |
 
-**On Tier 2:** If a post-event audit confirms fraud, the UPI transfer is tagged for recovery.
-
-**On Tier 3:** The worker receives the following notification: *"Your claim is under review due to unusual activity in your zone. We'll notify you within 4 hours."* No claim is automatically discarded without human review.
-
-**On Tier 4:** The worker receives: *"Your claim could not be verified. If you believe this is an error, contact support with your delivery platform's trip log for that day."* The delivery platform trip log is the one data source the syndicate cannot fake. If Ravi actually worked, Swiggy's records prove it.
-
-
-**The principle:** The burden of extended review falls on ambiguous cases, not on confirmed clean ones. A real worker in bad weather may wait a few hours. A syndicate member is rejected. A confirmed fraud account is suspended. The payout pool is protected while the 847 legitimate workers in Dharavi still get paid the same day.
+**The principle**: The burden of extended review falls on ambiguous cases, not on confirmed clean ones. A real worker in bad weather may wait a few hours. A syndicate member is rejected. A confirmed fraud account is suspended. The payout pool is protected while the 847 legitimate workers in Dharavi still get paid the same day.

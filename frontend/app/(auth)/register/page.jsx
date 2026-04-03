@@ -70,11 +70,11 @@ export default function RegisterPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Shift Start</label>
-                    <input type="time" value={shiftStart} onChange={e => setShiftStart(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                    <input type="time" value={shiftStart} onChange={e => setShiftStart(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Shift End</label>
-                    <input type="time" value={shiftEnd} onChange={e => setShiftEnd(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-transparent focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm" />
+                    <input type="time" value={shiftEnd} onChange={e => setShiftEnd(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface" />
                   </div>
                 </div>
 

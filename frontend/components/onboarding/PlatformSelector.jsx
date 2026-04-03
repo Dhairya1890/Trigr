@@ -21,7 +21,7 @@ export default function PlatformSelector({ selected, onSelect }) {
             className={cn(
               "px-4 py-2 rounded-full border-2 text-sm font-medium transition-all flex items-center gap-2",
               selected === p.id
-                ? "border-primary-container bg-primary-container/5 text-primary-container"
+                ? "border-primary-container bg-primary-container/10 text-primary-container bg-surface"
                 : "border-outline-variant/20 text-on-surface-variant hover:border-outline-variant"
             )}
           >
