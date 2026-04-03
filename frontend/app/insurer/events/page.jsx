@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { DataTable } from "@/components/ui/section";
+import { DataTable } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/badge";
 import { TrendingUp, Plus, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";

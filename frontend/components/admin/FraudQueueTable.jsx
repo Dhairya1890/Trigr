@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTable } from "@/components/ui/section";
+import { DataTable } from "@/components/ui/data-table";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check, X, Eye } from "lucide-react";

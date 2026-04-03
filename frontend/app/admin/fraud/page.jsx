@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MetricCard } from "@/components/ui/section";
+import { MetricCard } from "@/components/ui/metric-card";
 import FraudQueueTable from "@/components/admin/FraudQueueTable";
 import AlertConfigCard from "@/components/admin/AlertConfigCard";
 import { ShieldAlert, Fingerprint, Activity, Clock } from "lucide-react";

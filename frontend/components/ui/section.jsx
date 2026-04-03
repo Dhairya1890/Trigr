@@ -38,7 +38,3 @@ export function PageShell({ className, children }) {
   );
 }
 
-import { DataTable } from "./data-table";
-import { MetricCard } from "./metric-card";
-
-export { DataTable, MetricCard };

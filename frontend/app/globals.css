@@ -6,20 +6,63 @@
 :root {
   color-scheme: light;
 
-  --color-primary: #006591;
-  --color-primary-container: #0ea5e9;
-  --color-surface: #f9f9f9;
-  --color-surface-low: #f3f3f3;
-  --color-surface-lowest: #ffffff;
-  --color-surface-container: #eeeeee;
-  --color-on-surface: #1a1c1c;
-  --color-on-surface-variant: #3e4850;
-  --color-outline: #6e7881;
-  --color-outline-variant: #bec8d2;
-  --color-tertiary-container: #d88a00;
-  --color-error: #ba1a1a;
+  /* HSL Channels for opacity support */
+  --primary: 198 100% 28%;
+  --primary-container: 199 89% 48%;
+  --on-primary: 0 0% 100%;
+  --on-primary-container: 199 100% 16%;
+  --primary-fixed: 208 100% 90%;
+  --primary-fixed-dim: 205 100% 77%;
+  --on-primary-fixed: 202 100% 9%;
+  --on-primary-fixed-variant: 199 100% 22%;
+  --inverse-primary: 205 100% 77%;
 
-  --glass-bg: rgba(255, 255, 255, 0.8);
+  --secondary: 223 23% 41%;
+  --on-secondary: 0 0% 100%;
+  --secondary-container: 224 88% 89%;
+  --on-secondary-container: 223 24% 40%;
+  --secondary-fixed: 225 100% 93%;
+  --secondary-fixed-dim: 227 60% 83%;
+  --on-secondary-fixed: 221 69% 13%;
+  --on-secondary-fixed-variant: 224 29% 31%;
+
+  --tertiary: 37 100% 26%;
+  --tertiary-container: 38 100% 42%;
+  --on-tertiary: 0 0% 100%;
+  --on-tertiary-container: 36 100% 15%;
+  --tertiary-fixed: 32 100% 86%;
+  --tertiary-fixed-dim: 34 100% 69%;
+  --on-tertiary-fixed: 33 100% 8%;
+  --on-tertiary-fixed-variant: 37 100% 20%;
+
+  --error: 0 75% 42%;
+  --on-error: 0 0% 100%;
+  --error-container: 6 100% 92%;
+  --on-error-container: 356 100% 29%;
+
+  --surface: 180 3% 98%;
+  --surface-dim: 0 0% 85%;
+  --surface-bright: 180 3% 98%;
+  --surface-variant: 0 0% 89%;
+  --surface-tint: 198 100% 28%;
+  --surface-container: 0 0% 93%;
+  --surface-container-low: 180 3% 95%;
+  --surface-container-high: 180 3% 91%;
+  --surface-container-highest: 0 0% 89%;
+  --surface-container-lowest: 0 0% 100%;
+
+  --on-surface: 180 2% 11%;
+  --on-surface-variant: 206 13% 28%;
+  --inverse-surface: 180 2% 19%;
+  --inverse-on-surface: 180 4% 94%;
+  --outline: 208 8% 47%;
+  --outline-variant: 208 18% 78%;
+
+  --success: 142 76% 36%;
+  --warning: 38 100% 42%;
+  --danger: 0 75% 42%;
+
+  --glass-bg: 0 0% 100% / 0.8;
   --glass-blur: blur(12px);
 }
 
@@ -27,20 +70,49 @@
 .dark {
   color-scheme: dark;
 
-  --color-primary: #89ceff;
-  --color-primary-container: #004c6e;
-  --color-surface: #111315;
-  --color-surface-low: #191b1d;
-  --color-surface-lowest: #0d0f11;
-  --color-surface-container: #1e2022;
-  --color-on-surface: #e2e2e2;
-  --color-on-surface-variant: #bec8d2;
-  --color-outline: #8a949d;
-  --color-outline-variant: #3e4850;
-  --color-tertiary-container: #ffb95f;
-  --color-error: #ffb4ab;
+  --primary: 205 100% 77%;
+  --primary-container: 199 100% 22%;
+  --on-primary: 198 100% 28%;
+  --on-primary-container: 208 100% 90%;
+  
+  --secondary: 227 60% 83%;
+  --on-secondary: 221 29% 25%;
+  --secondary-container: 224 29% 31%;
+  --on-secondary-container: 225 100% 93%;
 
-  --glass-bg: rgba(17, 19, 21, 0.8);
+  --tertiary: 34 100% 69%;
+  --on-tertiary: 37 100% 20%;
+  --tertiary-container: 37 100% 20%;
+  --on-tertiary-container: 32 100% 86%;
+
+  --error: 6 100% 84%;
+  --on-error: 0 100% 21%;
+  --error-container: 0 100% 21%;
+  --on-error-container: 6 100% 92%;
+
+  --surface: 210 10% 8%;
+  --surface-dim: 210 10% 6%;
+  --surface-bright: 210 10% 12%;
+  --surface-variant: 208 13% 28%;
+  --surface-tint: 205 100% 77%;
+  --surface-container: 210 10% 11%;
+  --surface-container-low: 210 10% 10%;
+  --surface-container-high: 210 10% 14%;
+  --surface-container-highest: 210 10% 18%;
+  --surface-container-lowest: 210 10% 4%;
+
+  --on-surface: 180 4% 94%;
+  --on-surface-variant: 208 18% 78%;
+  --inverse-surface: 180 4% 94%;
+  --inverse-on-surface: 210 10% 8%;
+  --outline: 208 11% 60%;
+  --outline-variant: 208 13% 28%;
+
+  --success: 142 76% 45%;
+  --warning: 34 100% 69%;
+  --danger: 6 100% 84%;
+
+  --glass-bg: 210 10% 8% / 0.8;
   --glass-blur: blur(12px);
 }
 

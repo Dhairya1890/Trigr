@@ -13,21 +13,10 @@ export default function useDisruptions(city = "Mumbai") {
       try {
         setLoading(true);
         const data = await api.getActiveTriggers();
-        if (data && data.length > 0) {
-          setActiveEvents(data);
+        if (data && data.events) {
+          setActiveEvents(data.events);
         } else {
-          // Demo fallback: Active disruption in Mumbai
-          setActiveEvents([
-            {
-              id: "EVT-889",
-              type: "Heavy Rain",
-              city: "Mumbai",
-              zones: ["Dharavi", "Kurla", "Sion"],
-              since: "2:00 PM",
-              status: "ACTIVE",
-              intensity: "High"
-            }
-          ]);
+          setActiveEvents([]);
         }
       } catch (err) {
         setError(err.message);

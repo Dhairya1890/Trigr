@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { MetricCard } from "@/components/ui/section";
+import { MetricCard } from "@/components/ui/metric-card";
 import EventCard from "@/components/insurer/EventCard";
 import PoolHealthCard from "@/components/insurer/PoolHealthCard";
 import SimulatorButton from "@/components/shared/SimulatorButton";

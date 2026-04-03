@@ -1,9 +1,9 @@
 import { cn } from "@/components/ui/button";
 
 const variants = {
-  default: "bg-primary/10 text-primary-container",
+  default: "bg-primary-container/10 text-primary-container",
   success: "bg-success/10 text-success",
-  warning: "bg-tertiary-container/10 text-tertiary-container",
+  warning: "bg-warning/10 text-warning",
   danger:  "bg-error/10 text-error",
   muted:   "bg-surface-container text-outline",
   outline: "bg-transparent border border-outline-variant text-outline",

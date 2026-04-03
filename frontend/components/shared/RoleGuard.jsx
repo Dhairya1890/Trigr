@@ -21,8 +21,14 @@ export default function RoleGuard({ children, requiredRole }) {
       if (pathname.startsWith("/admin")) expectedRole = "admin";
     }
 
-    if (storedRole !== expectedRole && expectedRole) {
+    // Role hierarchy / logical checks
+    const isPublic = pathname === "/" || pathname.startsWith("/(auth)");
+    
+    if (expectedRole && storedRole !== expectedRole) {
       console.warn(`Unauthorized access attempt. Role: ${storedRole}, Required: ${expectedRole}`);
+      
+      // If they are a different role, maybe they shouldn't just be kicked to login
+      // but for now, simple redirection is safer.
       router.push("/login");
     } else {
       setAuthorized(true);
