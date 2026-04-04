@@ -16,58 +16,71 @@ import { api } from "@/lib/api";
 export default function RegisterQuotePage() {
   const router = useRouter();
   const { signup, loading: authLoading } = useAuth();
-  const [regData, setRegData] = useState(null);
-  const [quote, setQuote] = useState(null);
+  
+  // Instant synchronous initialization for "Zero-Wait" performance
+  const [regData, setRegData] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const saved = localStorage.getItem("trigr_reg");
+    if (!saved) return null;
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [quote, setQuote] = useState(() => {
+    if (!regData) return null;
+    const fallback = calculatePremiumPreview(regData);
+    return {
+      ...fallback,
+      baseRate: regData.earnings * 0.022,
+      riskMultiplier: fallback.riskTier === "HIGH" ? 1.15 : fallback.riskTier === "MEDIUM" ? 1.00 : 0.80,
+      seasonMultiplier: 1.00
+    };
+  });
+
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("trigr_reg");
-    if (!saved) { router.push("/register"); return; }
-    try {
-      const data = JSON.parse(saved);
-      setRegData(data);
-      
-      // Fetch dynamic quote from API
-      async function fetchQuote() {
-        const res = await api.calculatePremium(data);
-        if (res) {
-          setQuote({
-            weeklyPremium: res.weekly_premium,
-            riskTier: res.risk_tier,
-            coveragePct: res.coverage_pct,
-            maxPayout: res.max_payout,
-            baseRate: res.base_rate,
-            riskMultiplier: res.risk_multiplier,
-            seasonMultiplier: res.season_multiplier
-          });
-        } else {
-          // Fallback to local logic if API is completely unreachable
-          const fallback = calculatePremiumPreview(data);
-          setQuote({
-            ...fallback,
-            baseRate: data.earnings * 0.022,
-            riskMultiplier: fallback.riskTier === "HIGH" ? 1.15 : fallback.riskTier === "MEDIUM" ? 1.00 : 0.80,
-            seasonMultiplier: 1.00
-          });
-        }
-      }
-      fetchQuote();
-    } catch (e) {
+    if (!regData) {
       router.push("/register");
+      return;
     }
-  }, [router]);
+
+    // Silent background fetch to verify with backend
+    async function fetchQuote() {
+      const res = await api.calculatePremium(regData);
+      if (res) {
+        setQuote({
+          weeklyPremium: res.weekly_premium,
+          riskTier: res.risk_tier,
+          coveragePct: res.coverage_pct,
+          maxPayout: res.max_payout,
+          baseRate: res.base_rate,
+          riskMultiplier: res.risk_multiplier,
+          seasonMultiplier: res.season_multiplier
+        });
+      }
+    }
+    fetchQuote();
+  }, [regData, router]);
 
   async function handlePurchase() {
     setError("");
-    const res = await signup({
+    const finalData = {
       ...regData,
       weekly_premium: quote.weeklyPremium,
       risk_tier: quote.riskTier,
       coverage_pct: quote.coveragePct,
       max_payout: quote.maxPayout
-    });
+    };
+
+    const res = await signup(finalData);
     
     if (res.success) {
+      // Save for dashboard display without DB
+      localStorage.setItem("trigr_user", JSON.stringify(finalData));
       localStorage.removeItem("trigr_reg");
       router.push("/worker/dashboard");
     } else {

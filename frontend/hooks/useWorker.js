@@ -60,11 +60,33 @@ export default function useWorker() {
         ]);
 
         if (!cancelled) {
-          if (profileData) {
-            setWorker(profileData);
+          let mergedWorker = profileData;
+          let mergedPolicy = normalizePolicy(policyData);
+
+          // --- DEMO PERSISTENCE ---
+          // Use localStorage to reflect user-entered data without a database.
+          try {
+            const localUser = localStorage.getItem("trigr_user");
+            if (localUser) {
+              const parsed = JSON.parse(localUser);
+              mergedWorker = { ...profileData, ...parsed };
+              
+              // Ensure policy matches what was quoted
+              if (mergedPolicy && parsed.weekly_premium) {
+                mergedPolicy.premiumPaid = parsed.weekly_premium;
+                mergedPolicy.maxPayout = parsed.max_payout;
+                mergedPolicy.riskTier = parsed.risk_tier;
+              }
+            }
+          } catch (e) {
+            console.error("Failed to load local user data", e);
           }
-          if (policyData) {
-            setPolicy(normalizePolicy(policyData));
+
+          if (mergedWorker) {
+            setWorker(mergedWorker);
+          }
+          if (mergedPolicy) {
+            setPolicy(mergedPolicy);
           }
           if (claimsData?.claims) {
             setClaims(normalizeClaims(claimsData.claims));

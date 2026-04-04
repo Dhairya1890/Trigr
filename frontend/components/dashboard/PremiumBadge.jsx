@@ -1,8 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/formatters";
 
-export default function PremiumBadge({ premium }) {
-  const data = premium || { weeklyPremium: 131, riskTier: "HIGH", nextRenewal: "Apr 14" };
+export default function PremiumBadge({ premium, policy }) {
+  const data = premium || { weeklyPremium: 131, riskTier: "MEDIUM", nextRenewal: "Next Week" };
+  const maxPayout = policy?.maxPayout || policy?.max_payout || 3600;
+  const coveragePct = policy?.coveragePct || policy?.coverage_pct || 80;
 
   return (
     <Card hover className="overflow-hidden border-none shadow-elevated bg-surface-container-low/50">
@@ -11,7 +14,7 @@ export default function PremiumBadge({ premium }) {
           <p className="text-[10px] uppercase tracking-[0.2em] font-black text-outline">Current Premium</p>
           <div className="flex items-center justify-center gap-1.5 py-2">
             <span className="text-4xl md:text-5xl font-headline font-black text-primary font-currency tracking-tighter">
-              ₹{data.weeklyPremium}
+              {formatCurrency(data.weeklyPremium)}
             </span>
           </div>
         </div>
@@ -22,6 +25,14 @@ export default function PremiumBadge({ premium }) {
             <span className="text-xs font-black text-on-surface bg-surface-container-highest px-3 py-1 rounded-lg border border-outline-variant/10">
               {data.riskTier}
             </span>
+          </div>
+          <div className="flex justify-between items-center px-2">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline">Max Payout</span>
+            <span className="text-xs font-black text-on-surface font-currency">{formatCurrency(maxPayout)}</span>
+          </div>
+          <div className="flex justify-between items-center px-2">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline">Coverage</span>
+            <span className="text-xs font-black text-on-surface">{coveragePct}%</span>
           </div>
           <div className="flex justify-between items-center px-2">
             <span className="text-[10px] uppercase tracking-widest font-black text-outline">Renewal</span>

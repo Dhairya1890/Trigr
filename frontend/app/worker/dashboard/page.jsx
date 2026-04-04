@@ -62,9 +62,9 @@ export default function WorkerDashboardPage() {
 
       {/* Main grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <PolicyCard policy={policy} />
+        <PolicyCard policy={policy} worker={worker} />
         <WeatherWidget weather={weather} />
-        <PremiumBadge premium={premiumData} />
+        <PremiumBadge premium={premiumData} policy={policy} />
       </div>
 
       {/* Payout timeline */}

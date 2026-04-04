@@ -133,18 +133,45 @@ export const api = {
   getWorkerProfile: async (workerId = "me") => {
     const res = await fetcher(`/workers/${workerId}`);
     if (res || !IS_DEMO_MODE) return res;
-    return { id: workerId, name: "Ravi Kumar", platform: "Swiggy", zone: "Dharavi", city: "Mumbai" };
+    return { 
+      id: workerId, 
+      name: "Ravi Kumar", 
+      platform: "Swiggy", 
+      zone: "Dharavi", 
+      city: "Mumbai",
+      weekly_earnings: 4500,
+      weeklyEarnings: 4500,
+      risk_tier: "MEDIUM",
+      riskTier: "MEDIUM",
+      verification_tier: 2,
+      verificationTier: 2,
+      upi_verified: true,
+      shift_start: "10:00",
+      shift_end: "22:00",
+      working_days: 6,
+    };
   },
 
   getPolicy: async (workerId = "me") => {
     const res = await fetcher(`/policies/${workerId}`);
     if (res || !IS_DEMO_MODE) return res;
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
     return {
       policy_id: "POL-88219",
       status: "ACTIVE",
-      week_start: "2026-04-14",
-      week_end: "2026-04-20",
+      week_start: weekStart.toISOString().split('T')[0],
+      week_end: weekEnd.toISOString().split('T')[0],
       premium_paid: 131,
+      max_payout: 3600,
+      maxPayout: 3600,
+      coverage_pct: 0.80,
+      coveragePct: 80,
+      verification_tier: 2,
+      verificationTier: 2,
       coverage_type: "Heavy Rain & Flood",
     };
   },
@@ -152,10 +179,26 @@ export const api = {
   getClaims: async (workerId = "me") => {
     const res = await fetcher(`/claims/${workerId}`);
     if (res || !IS_DEMO_MODE) return res;
+
+    // --- LIVE DEMO CLAIMS ---
+    // Merge simulated claims from localStorage
+    let simulatedClaims = [];
+    try {
+      const saved = localStorage.getItem("trigr_simulated_claims");
+      if (saved) simulatedClaims = JSON.parse(saved);
+    } catch (e) {}
+
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const lastWeek = new Date(today);
+    lastWeek.setDate(today.getDate() - 7);
+
     return {
       claims: [
-        { id: "CLM-001", date: "2026-04-12", type: "Heavy Rain", amount: 450, status: "PAID" },
-        { id: "CLM-002", date: "2026-04-05", type: "AQI Hazard", amount: 180, status: "PAID" },
+        ...simulatedClaims,
+        { id: "CLM-001", date: yesterday.toISOString().split('T')[0], type: "Heavy Rain", amount: 450, status: "PAID", event: "Heavy Rain", zone: "Dharavi" },
+        { id: "CLM-002", date: lastWeek.toISOString().split('T')[0], type: "AQI Hazard", amount: 180, status: "PAID", event: "AQI Hazard", zone: "Dharavi" },
       ]
     };
   },
@@ -205,8 +248,32 @@ export const api = {
       method: "POST",
       body: JSON.stringify(params),
     });
-    if (res || !IS_DEMO_MODE) return res;
-    return { status: "queued", message: "Simulation triggered successfully (Demo Mode)" };
+    
+    if (IS_DEMO_MODE) {
+      // Create a reactive demo claim
+      const newClaim = {
+        id: "CLM-" + Math.random().toString(36).substr(2, 6).toUpperCase(),
+        date: new Date().toISOString().split('T')[0],
+        type: params.type || "Weather Alert",
+        event: params.type || "Weather Alert",
+        amount: Math.floor(Math.random() * (1200 - 250 + 1)) + 250,
+        status: "PAID",
+        zone: params.zone || "Active Zone",
+        isSimulated: true
+      };
+
+      try {
+        const existing = JSON.parse(localStorage.getItem("trigr_simulated_claims") || "[]");
+        localStorage.setItem("trigr_simulated_claims", JSON.stringify([newClaim, ...existing]));
+        
+        // Notify the dashboard to refresh
+        window.dispatchEvent(new CustomEvent("trigr:simulation"));
+      } catch (e) {}
+
+      if (!res) return { status: "queued", message: "Simulation triggered successfully (Demo Mode)", claim: newClaim };
+    }
+    
+    return res;
   },
 
   // --- INSURER & ADMIN ---

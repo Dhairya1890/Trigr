@@ -4,14 +4,21 @@ import { StatusBadge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency, formatShortDate } from "@/lib/formatters";
 
-const mockTimeline = [
-  { id: "1", date: "2026-07-17", event: "Heavy Rain", zone: "Dharavi", amount: 250, status: "PAID" },
-  { id: "2", date: "2026-07-22", event: "Flood Alert", zone: "Kurla", amount: 420, status: "PAID" },
-  { id: "3", date: "2026-08-03", event: "AQI Hazard", zone: "Dharavi", amount: 180, status: "PROCESSING" },
-];
+function getMockTimeline() {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const threeDaysAgo = new Date(today);
+  threeDaysAgo.setDate(today.getDate() - 3);
+  
+  return [
+    { id: "1", date: yesterday.toISOString().split('T')[0], event: "Heavy Rain", zone: "Dharavi", amount: 250, status: "PAID" },
+    { id: "2", date: threeDaysAgo.toISOString().split('T')[0], event: "Flood Alert", zone: "Kurla", amount: 420, status: "PAID" },
+  ];
+}
 
 export default function PayoutTimeline({ claims }) {
-  const data = claims?.length ? claims : mockTimeline;
+  const data = claims?.length ? claims : getMockTimeline();
 
   return (
     <Card hover className="border-none bg-surface-container-low/50 shadow-elevated">
@@ -35,7 +42,7 @@ export default function PayoutTimeline({ claims }) {
                 <div className="space-y-0.5">
                   <p className="text-sm font-medium">{claim.event || claim.type}</p>
                   <p className="text-xs font-bold uppercase tracking-wider text-outline">
-                    {formatShortDate(claim.date)} · {claim.zone || "Mumbai"}
+                    {formatShortDate(claim.date)} · {claim.zone || claim.city || "Mumbai"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 text-right">

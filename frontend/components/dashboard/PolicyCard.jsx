@@ -1,10 +1,10 @@
-import { Calendar, ShieldCheck } from "lucide-react";
+import { Calendar, ShieldCheck, Wallet } from "lucide-react";
 
 import { StatusBadge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency, formatDateRange } from "@/lib/formatters";
 
-export default function PolicyCard({ policy }) {
+export default function PolicyCard({ policy, worker }) {
   const data = policy || {
     status: "ACTIVE",
     weekStart: "2026-04-07",
@@ -14,6 +14,9 @@ export default function PolicyCard({ policy }) {
     coveragePct: 80,
     verificationTier: 2,
   };
+
+  const weeklyIncome = worker?.weeklyEarnings || worker?.weekly_earnings || 4500;
+  const riskTier = worker?.riskTier || worker?.risk_tier || "MEDIUM";
 
   return (
     <Card hover className="border-none bg-surface-container-low/50 shadow-elevated">
@@ -41,10 +44,10 @@ export default function PolicyCard({ policy }) {
         <div className="grid grid-cols-2 gap-4 border-t border-outline-variant/10 pt-6">
           <div className="space-y-1">
             <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-outline">
-              <Calendar className="h-3 w-3" /> Coverage
+              <Wallet className="h-3 w-3" /> Verified Income
             </span>
-            <p className="text-sm font-bold text-on-surface">
-              {formatDateRange(data.weekStart, data.weekEnd)}
+            <p className="font-currency text-sm font-bold text-on-surface">
+              {formatCurrency(weeklyIncome)}<span className="text-outline font-medium">/week</span>
             </p>
           </div>
           <div className="space-y-1">
@@ -54,12 +57,24 @@ export default function PolicyCard({ policy }) {
             </p>
           </div>
           <div className="space-y-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-outline">Tier</span>
-            <p className="text-sm font-bold text-on-surface">Verification {data.verificationTier}</p>
+            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-outline">
+              <Calendar className="h-3 w-3" /> Coverage
+            </span>
+            <p className="text-sm font-bold text-on-surface">
+              {formatDateRange(data.weekStart, data.weekEnd)}
+            </p>
           </div>
           <div className="space-y-1">
             <span className="text-[10px] font-black uppercase tracking-widest text-outline">Protection</span>
             <p className="text-sm font-bold text-on-surface">{data.coveragePct}% Income</p>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-outline">Verification Tier</span>
+            <p className="text-sm font-bold text-on-surface">Tier {data.verificationTier}</p>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-outline">Risk Profile</span>
+            <p className="text-sm font-bold text-on-surface">{riskTier}</p>
           </div>
         </div>
       </CardContent>
