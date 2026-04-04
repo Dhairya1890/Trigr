@@ -67,9 +67,9 @@ export default function WorkerPolicyPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { label: "Premium", value: `₹${policy?.premium_paid || 0}/wk` },
-              { label: "Max Payout", value: "₹3,600/wk" },
-              { label: "Coverage", value: "80%" },
-              { label: "Tier", value: "Tier 2" },
+              { label: "Max Payout", value: `₹${(policy?.max_payout || 3600).toLocaleString()}/wk` },
+              { label: "Coverage", value: `${policy?.coverage_pct || 80}%` },
+              { label: "Tier", value: policy?.verification_tier ? `Tier ${policy.verification_tier}` : "Tier 1" },
             ].map(item => (
               <div key={item.label} className="p-6 rounded-2xl bg-surface-container-lowest/80 border border-outline-variant/10 space-y-2 text-center group hover:border-primary/20 transition-colors">
                 <p className="text-[10px] uppercase tracking-[0.2em] font-black text-outline">{item.label}</p>

@@ -56,10 +56,10 @@ export default function InsurerDashboardPage() {
 
       {/* Metric Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard label="Active Policies" value={poolStats?.active_workers || "842"} icon={ShieldCheck} trend="+12% this week" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
-        <MetricCard label="Total Payouts" value={`₹${((poolStats?.payouts_issued || 1240000)/100000).toFixed(1)}L`} icon={Activity} trend="+₹45k today" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard label="Active Policies" value={poolStats?.active_workers?.toLocaleString() || "0"} icon={ShieldCheck} trend="+12% this week" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard label="Total Payouts" value={`₹${((poolStats?.payouts_issued || 0)/100000).toFixed(1)}L`} icon={Activity} trend="+₹45k today" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
         <MetricCard label="Active Triggers" value={safeEvents.length} icon={AlertTriangle} trend={safeEvents.length > 0 ? "Elevated" : "Stable"} className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
-        <MetricCard label="Insured Workers" value={poolStats?.active_workers || "1,150"} icon={Users} trend="+34 today" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard label="Reserve Buffer" value={`₹${((poolStats?.reserve_buffer || 0)/100000).toFixed(1)}L`} icon={Users} trend="Solvent" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">

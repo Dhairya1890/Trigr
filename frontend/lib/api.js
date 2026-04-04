@@ -34,10 +34,17 @@ async function fetcher(endpoint, options = {}) {
 
 export const api = {
   // --- AUTH & REGISTRATION ---
+  // Auth is handled locally in AuthContext for this demo phase.
+  // We include these here for future backend connectivity.
   login: async (credentials) => {
-    // Demo-only auth logic
-    localStorage.setItem("trigr_role", credentials.role || "worker");
-    localStorage.setItem("trigr_user", JSON.stringify({ name: "Demo User", id: "wrk_demo" }));
+    // Attempt real fetch first if backend ever adds an auth route
+    const res = await fetcher("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    if (res || !IS_DEMO_MODE) return res;
+    
+    // Explicit demo fallback
     return { token: "demo-token", role: credentials.role || "worker" };
   },
 
@@ -58,10 +65,10 @@ export const api = {
     };
   },
 
-  verifyUPI: async (upi_id, worker_id) => {
+  verifyUPI: async (upiId, workerId) => {
     const res = await fetcher("/workers/verify-upi", {
       method: "POST",
-      body: JSON.stringify({ upi_id, worker_id }),
+      body: JSON.stringify({ upi_id: upiId, worker_id: workerId }),
     });
     if (res !== null || !IS_DEMO_MODE) return res;
     return { verified: true, message: "UPI verified (Demo Mode)" };
@@ -75,7 +82,7 @@ export const api = {
     });
     if (res || !IS_DEMO_MODE) return res;
     
-    // Fallback logic matching lib/premiumCalc.js
+    // Fallback logic
     return {
       weekly_premium: 131,
       risk_tier: "LOW",
@@ -115,7 +122,25 @@ export const api = {
     };
   },
 
-  // --- TRIGGERS & SIMULATION ---
+  // --- WEATHER & TRIGGERS ---
+  getWeather: async (city = "Mumbai") => {
+    const res = await fetcher(`/triggers/weather?city=${city}`);
+    if (res || !IS_DEMO_MODE) return res;
+    
+    // Centralized high-fidelity weather fallback
+    return {
+      city: city,
+      temp: "29°C",
+      humidity: "82%",
+      windSpeed: "18 km/h",
+      condition: "Partly Cloudy",
+      aqi: 85,
+      aqiLabel: "Moderate",
+      rainfall3h: "2.4mm",
+      last_updated: new Date().toLocaleTimeString(),
+    };
+  },
+
   getActiveTriggers: async () => {
     const res = await fetcher("/triggers/active");
     if (res || !IS_DEMO_MODE) return res;

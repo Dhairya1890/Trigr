@@ -12,8 +12,9 @@ export default function UPIVerifyCard({ upi, onVerified, onSkip }) {
   async function handleVerify() {
     setState("sending");
     try {
-      // Call the API (fallback already defined in lib/api.js if down)
-      const res = await api.verifyUPI(upi, "me");
+      // Use a temporary onboarding ID if no worker ID is provided
+      const targetId = upi.split("@")[0] || "onboarding_user";
+      const res = await api.verifyUPI(upi, targetId);
       
       // Simulate penny drop delay for premium UI feel
       await new Promise((r) => setTimeout(r, 1500));

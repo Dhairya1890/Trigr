@@ -58,8 +58,8 @@ export default function AdminFraudPage() {
 
       {/* Metric Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard label="Pending Review" value={queue.length} icon={Clock} trend="-2 since 1h ago" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
-        <MetricCard label="Fraud Intercepted" value="142" icon={ShieldAlert} trend="+5 today" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard label="Pending Review" value={queue.length} icon={Clock} trend={queue.length > 5 ? "Action Required" : "Stable"} className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard label="Fraud Intercepted" value="14" icon={ShieldAlert} trend="+2 this week" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
         <MetricCard label="Avg Risk Score" value="42/100" icon={Fingerprint} trend="Stable" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
         <MetricCard label="Accuracy" value="98.5%" icon={Activity} trend="+0.2%" className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
       </div>

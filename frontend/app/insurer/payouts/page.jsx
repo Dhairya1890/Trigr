@@ -23,14 +23,17 @@ export default function InsurerPayoutsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [payouts, setPayouts] = useState([]);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const data = await api.getPayoutLedger();
-        if (data?.payouts) {
-          setPayouts(data.payouts);
-        }
+        const [ledgerData, healthData] = await Promise.all([
+          api.getPayoutLedger(),
+          api.getPoolHealth()
+        ]);
+        if (ledgerData?.payouts) setPayouts(ledgerData.payouts);
+        if (healthData) setStats(healthData);
       } finally {
         setLoading(false);
       }
@@ -66,9 +69,27 @@ export default function InsurerPayoutsPage() {
 
       {/* Metric Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <MetricCard label="Total Disbursed" value="₹14.2L" trend="+₹12k today" icon={IndianRupee} className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
-        <MetricCard label="Pending Approval" value="12" sub="₹4,200 total value" icon={Clock} className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
-        <MetricCard label="Avg Payout Time" value="4.2m" sub="Via IMPS/UPI" icon={ArrowUpRight} className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" />
+        <MetricCard 
+          label="Total Disbursed" 
+          value={`₹${((stats?.payouts_issued || 0)/100000).toFixed(1)}L`} 
+          trend="+₹12k today" 
+          icon={IndianRupee} 
+          className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" 
+        />
+        <MetricCard 
+          label="Pending Approval" 
+          value={payouts.filter(p => p.status === 'PROCESSING').length} 
+          sub="Requires verification" 
+          icon={Clock} 
+          className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" 
+        />
+        <MetricCard 
+          label="Avg Payout Time" 
+          value="4.2m" 
+          sub="Via IMPS/UPI" 
+          icon={ArrowUpRight} 
+          className="bg-surface-container-low/50 border-none shadow-card hover:shadow-elevated transition-all" 
+        />
       </div>
 
       {/* Table Section */}
