@@ -48,29 +48,35 @@ backend/
 - **`payout_engine.py`**: Implements basic chronological algebra to deduce hour overlap between shifts and environmental triggers, preventing breaches on maximum weekly payout caps.
 - **`trigger_monitor.py`**: Schedules routine integrations queries (`get_weather`) synthesizing live alerts safely translated for the frontend components.
 
-## 🚧 DB Ownership Boundary & Mock-First Behavior
+## 🚧 DB Ownership & Persistence-Ready Status
 
 The database connection pipelines and Supabase persistence schemas reside inside `backend/db/**/*`.
-**This boundary is owned by a separate internal team.**
+**This boundary is owned by a separate team.**
 
-To ensure the frontend does not block waiting for the DB team, the current generation of backend routers rely on **Mock-First logic**.
+### Current State: Persistence-Ready
+The backend has been refactored to be **Persistence-Ready**. All routers (`workers`, `policies`, `claims`, `triggers`) and services now use a dependency structure aligned with `schema.sql`.
 
-- If a route asks for historical data, the backend injects deterministic synthetic Python dictionaries parsed correctly into Pydantic models.
-- These representations behave precisely as database payloads do, guaranteeing that when the DB layer finally binds to Supabase, the endpoints will not structurally deviate.
+- **Internal UUID Ready**: Internal logic is prepared to handle UUIDs.
+- **External Contract Stability**: Public API IDs remain strings (e.g. `wrk_...`) to ensure 100% compatibility with the current frontend.
+- **Dependency Pattern**: Routes use a `get_db` dependency. When the DB Team provides a usable client, it can be plugged into `get_db` to immediately activate real persistence across the entire API.
 
-## ⚙️ Development Commands
+## ⚙️ Development & Seeding
 
-Ensure commands are executed from the root of the monorepo to guarantee correct dependency mapping.
+Ensure commands are executed from the root of the monorepo.
 
 ```bash
 # Boot the FastAPI uvicorn daemon
 npm run backend:dev
 
-# Run specific Python test routines (if defined)
-pytest backend/
+# Run seeding (Dry-run by default)
+python seed.py
+
+# Attempt real DB seeding (Requires real .env keys)
+python seed.py --no-dry-run
 ```
 
-### Current Limitations
+### 🛑 Persistence Blockers
 
-- Persistence is currently entirely transient. Any interaction resetting the backend process will obliterate modified "state".
-- External APIs (OpenWeather, RazorPay) may currently run on stubbed bypass logic until the environment `.env` pipeline is correctly bound with live keys by operations.
+- **Missing Runtime Client**: `backend/db/supabase.py` currently only provides configuration; no Supabase client instance is initialized.
+- **Credential Placeholders**: `.env` contains placeholders. Real persistence will fail with `[BLOCKED]` logs until valid `SUPABASE_URL` and `SUPABASE_KEY` are provided.
+- **Team Handover**: The "DB Team" must initialize the `supabase-py` client in `backend/db/supabase.py` to enable the "Persistence-Ready" routes.

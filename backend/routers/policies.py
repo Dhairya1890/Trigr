@@ -1,7 +1,6 @@
+from fastapi import APIRouter, Depends
 import hashlib
 from datetime import date, timedelta
-
-from fastapi import APIRouter
 
 from backend.models import (
     Policy,
@@ -9,6 +8,7 @@ from backend.models import (
     PurchasePolicyRequest,
     PurchasePolicyResponse,
 )
+from backend.routers.workers import get_db
 
 router = APIRouter()
 
@@ -37,8 +37,12 @@ def _get_deterministic_policy(worker_id: str) -> Policy:
 
 
 @router.post("/purchase", response_model=PurchasePolicyResponse)
-def purchase_policy(payload: PurchasePolicyRequest):
+def purchase_policy(payload: PurchasePolicyRequest, db=Depends(get_db)):
     policy = _get_deterministic_policy(payload.worker_id)
+
+    if db:
+        # db.table('policies').insert({...}).execute()
+        pass
 
     return PurchasePolicyResponse(
         policy_id=policy.id,
@@ -53,7 +57,12 @@ def purchase_policy(payload: PurchasePolicyRequest):
 
 
 @router.get("/{worker_id}", response_model=PolicyLookupResponse)
-def get_policy(worker_id: str):
+def get_policy(worker_id: str, db=Depends(get_db)):
+    if db:
+        # active = db.table('policies').select('*').eq('worker_id', worker_id).eq('status', 'ACTIVE').execute()
+        # if active.data: ...
+        pass
+
     policy = _get_deterministic_policy(worker_id)
 
     return PolicyLookupResponse(

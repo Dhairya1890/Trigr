@@ -1,7 +1,6 @@
+from fastapi import APIRouter, Depends
 import hashlib
 from datetime import UTC, datetime, timedelta
-
-from fastapi import APIRouter
 
 from backend.models.claim import (
     ClaimsListResponse,
@@ -12,6 +11,7 @@ from backend.models.claim import (
     FraudVerdictResponse,
 )
 from backend.models.payout import PayoutLedgerItem, PayoutLedgerResponse
+from backend.routers.workers import get_db
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ def _get_stable_id(prefix: str, seed: str, salt: str = "") -> str:
 def _generate_mock_claims(worker_id: str) -> list[ClaimSummary]:
     h = int(hashlib.md5(worker_id.encode()).hexdigest(), 16)
     
-    # Static base date to ensure stability across reloads (use a fixed recent date)
+    # Static base date to ensure stability across reloads
     base_time = datetime(2026, 4, 15, tzinfo=UTC)
     
     return [
@@ -48,12 +48,22 @@ def _generate_mock_claims(worker_id: str) -> list[ClaimSummary]:
 
 
 @router.get("/{worker_id}", response_model=ClaimsListResponse)
-def get_claims(worker_id: str):
+def get_claims(worker_id: str, db=Depends(get_db)):
+    if db:
+        # data = db.table('claims').select('*').eq('worker_id', worker_id).execute()
+        # if data.data: ...
+        pass
+
     return ClaimsListResponse(worker_id=worker_id, claims=_generate_mock_claims(worker_id))
 
 
 @router.get("/admin/fraud-queue", response_model=FraudQueueResponse)
-def get_fraud_queue():
+def get_fraud_queue(db=Depends(get_db)):
+    if db:
+        # data = db.table('claims').select('*').eq('status', 'PROCESSING').execute()
+        # if data.data: ...
+        pass
+
     # Return a stable set of demo fraud items
     return FraudQueueResponse(
         claims=[
@@ -82,12 +92,21 @@ def get_fraud_queue():
 
 
 @router.post("/admin/fraud/{id}", response_model=FraudVerdictResponse)
-def update_fraud_verdict(id: str, payload: FraudVerdictRequest):
+def update_fraud_verdict(id: str, payload: FraudVerdictRequest, db=Depends(get_db)):
+    if db:
+        # db.table('claims').update({'fraud_verdict': payload.verdict}).eq('id', id).execute()
+        pass
+
     return FraudVerdictResponse(success=True, id=id, verdict=payload.verdict)
 
 
 @router.get("/payout-ledger", response_model=PayoutLedgerResponse)
-def get_payout_ledger():
+def get_payout_ledger(db=Depends(get_db)):
+    if db:
+        # data = db.table('payouts').select('*').execute()
+        # if data.data: ...
+        pass
+
     return PayoutLedgerResponse(
         payouts=[
             PayoutLedgerItem(

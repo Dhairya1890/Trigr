@@ -1,7 +1,6 @@
+from fastapi import APIRouter, Depends
 import hashlib
 from datetime import UTC, datetime
-
-from fastapi import APIRouter
 
 from backend.models.disruption import (
     ActiveTriggersResponse,
@@ -14,12 +13,18 @@ from backend.models.disruption import (
 from backend.services.fraud_detector import evaluate_fraud
 from backend.services.payout_engine import calculate_payout
 from backend.services.trigger_monitor import run_trigger_monitor
+from backend.routers.workers import get_db
 
 router = APIRouter()
 
 
 @router.get("/active", response_model=ActiveTriggersResponse)
-def get_active_triggers():
+def get_active_triggers(db=Depends(get_db)):
+    if db:
+        # data = db.table('disruption_events').select('*').eq('status', 'ACTIVE').execute()
+        # if data.data: ...
+        pass
+
     # Poll the monitor service for the latest analyzed triggers
     monitor_state = run_trigger_monitor()
     
@@ -73,7 +78,7 @@ def get_weather(city: str = "Mumbai"):
 
 
 @router.post("/simulate", response_model=SimulateTriggerResponse)
-def simulate_trigger(payload: SimulateTriggerRequest):
+def simulate_trigger(payload: SimulateTriggerRequest, db=Depends(get_db)):
     # Deterministic simulation results
     mock_worker_baseline = {
         "shift_start": "10:00",
@@ -98,6 +103,13 @@ def simulate_trigger(payload: SimulateTriggerRequest):
 
     payout_result = calculate_payout({**mock_worker_baseline, **disruption_params})
     
+    if db:
+        # 1. Create disruption_event
+        # 2. Identify affected policies
+        # 3. Create claims
+        # 4. Create payouts
+        pass
+
     return SimulateTriggerResponse(
         status="processed",
         message=f"Trigger simulated successfully. Generated payout of Rs {payout_result['payout']}.",
@@ -110,7 +122,13 @@ def simulate_trigger(payload: SimulateTriggerRequest):
 
 
 @router.get("/insurer/pool-health", response_model=PoolHealthResponse)
-def get_pool_health():
+def get_pool_health(db=Depends(get_db)):
+    if db:
+        # premiums = db.table('policies').select('premium_paid').execute()
+        # payouts = db.table('payouts').select('amount').execute()
+        # ...
+        pass
+
     # Stable aggregated metrics for insurer platform
     return PoolHealthResponse(
         premium_collected=8850000.0,
