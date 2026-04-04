@@ -12,5 +12,8 @@
     "backend:dev": "python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000",
     "backend:install": "python -m pip install --user -r backend/requirements.txt",
     "seed": "python seed.py"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1"
   }
 }
