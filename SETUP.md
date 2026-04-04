@@ -1,114 +1,103 @@
-# Trigr Setup
+# Trigr Setup Guide
 
-This repo is scaffolded as a monorepo with:
-
-- `frontend/` for the Next.js 14 app
-- `backend/` for the FastAPI API
+Welcome to the Trigr monorepo. This project consists of a **Next.js 14** frontend and a **FastAPI** backend.
 
 ## Prerequisites
 
-- Node.js 22+
-- Python 3.13+
+- **Node.js**: 22+
+- **Python**: 3.13+
+- **Docker**: Optional (for containerized development)
 
-## Environment files
+## Environment Configuration
 
-Copy the templates before running locally:
+Copy the following templates to initialize your local environment:
 
-```powershell
-Copy-Item .env.example .env
-Copy-Item .env.local.example frontend/.env.local
+```bash
+# Root / Backend environment
+cp .env.example .env
+
+# Frontend environment
+cp .env.local.example frontend/.env.local
 ```
 
-## Install
+## Installation
 
-### Frontend
-
-```powershell
+### 1. Frontend Dependencies
+```bash
 npm install
 ```
 
-### Backend
-
-```powershell
+### 2. Backend Dependencies
+```bash
+# Via npm script
 npm run backend:install
-# or directly:
-python -m pip install --user -r backend/requirements.txt
+
+# Or directly via pip
+python -m pip install -r backend/requirements.txt
 ```
 
-## Run locally
+## Local Development
 
-### Frontend (Next.js dev server on :3000)
+### Run Services Independently
+Open two terminal windows:
 
-```powershell
-npm run dev
-```
+1. **Frontend** (:3000): `npm run dev`
+2. **Backend** (:8000): `npm run backend:dev`
 
-### Backend (FastAPI dev server on :8000)
-
-```powershell
-npm run backend:dev
-```
-
-### Docker (both services)
-
-```powershell
+### Run via Docker
+```bash
 docker compose up
 ```
 
-## Lint & Format
+## Quality & Linting
 
-### Frontend only
+We enforce strict linting for both environments. Use the following commands to verify your changes before pushing:
 
-```powershell
-npm run lint
-```
-
-### Backend only
-
-```powershell
-npm run backend:lint        # ruff lint check
-npm run backend:format      # ruff auto-format
-npm run backend:format:check  # format dry-run (CI-friendly)
-```
-
-### All (frontend + backend)
-
-```powershell
+```bash
+# Run all checks (Frontend + Backend)
 npm run lint:all
+
+# Backend-specific checks
+npm run backend:lint        # Ruff lint
+npm run backend:format      # Ruff auto-format
 ```
 
-## Seed data
+## Seeding Demo Data
 
-```powershell
-npm run seed               # dry-run: prints seed summary
-npm run seed:export        # exports seed_data.json for inspection
-python seed.py --help      # full CLI options
+The backend uses a deterministic seeding script to populate the UI with realistic worker profiles and policy history.
+
+```bash
+# Dry-run (prints summary only)
+npm run seed
+
+# Export to JSON
+npm run seed:export
 ```
 
-## Project structure
+---
 
-```
+## 🚫 Current Production Gaps
+
+This repository is currently in a **Release-Ready Demo** state. The following architectural components are not yet production-secure:
+
+1. **Authentication**: Auth is entirely **client-side/simulated**. There is no backend session validation or password hashing.
+2. **Persistence**: The backend is **Persistence-Ready** but currently relies on **Deterministic Mocks**. Real Supabase integration is pending DB client initialization in `backend/db/`.
+3. **Secrets Management**: `.env.example` contains placeholders. Production keys for RazorPay and Weather APIs are required for live data.
+4. **Encryption**: PPI (Personally Identifiable Information) is handled in plain text for demo purposes.
+
+## Project Structure
+
+```text
 Trigr/
-├── frontend/          Next.js 14 app (Vercel)
-├── backend/
-│   ├── main.py        FastAPI entry point
-│   ├── models/        Pydantic schemas (aligned to db/schema.sql)
-│   ├── routers/       API route handlers
-│   ├── services/      Business logic (premium calc, risk scorer, etc.)
-│   ├── integrations/  External API adapters (weather, news, razorpay)
-│   ├── ml/            ML model scaffolds (future)
-│   ├── db/            Database schema and connection (separate ownership)
-│   └── requirements.txt
-├── seed.py            Demo seed data generator
-├── pyproject.toml     Backend lint/format config (ruff, black)
-├── docker-compose.yml Docker dev environment
-├── .env.example       Backend env template
-└── package.json       Monorepo scripts (frontend + backend)
+|-- frontend/          Next.js 14 App (Tailwind, shadcn/ui)
+|-- backend/           FastAPI Python API
+|   |-- main.py        Entry point & Scheduler
+|   |-- models/        Pydantic schemas (aligned to schema.sql)
+|   |-- routers/       API route handlers
+|   |-- services/      Logic (Fraud, Payout, Premium)
+|   |-- integrations/  External API adapters
+|   |-- db/            DB connection (Separate Ownership)
+|-- seed.py            Deterministic data generator
+|-- docker-compose.yml 
+|-- package.json       Monorepo scripts
 ```
-
-## Notes
-
-- `README.md` and `img/` are preserved from the original project brief.
-- The current scaffold includes placeholder routes and mocked integrations so teammates can start building by stage.
-- DB connection and Supabase integration are handled separately — see `backend/db/`.
-- Backend models in `backend/models/` are Pydantic schemas aligned to `backend/db/schema.sql` but do NOT include persistence logic.

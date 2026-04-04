@@ -1,68 +1,56 @@
 # Backend Implementation Guide
 
 This document captures the implementation details for the Trigr Backend (FastAPI).
-The backend handles algorithmic premium calculation, deterministic mock generation, and trigger integrations.
 
-## 📁 FastAPI Structure
+## Architecture
 
 ```text
 backend/
-├── db/                   # Database schemas and Supabase interfaces (OWNED SEPARATELY)
-├── integrations/         # External real-world service bindings (NewsAPI, OpenWeather, OpenAQ, RazorPay)
-├── models/               # Pydantic schemas (Data Contracts)
-├── routers/              # Controller layer mapping out HTTP API paths
-├── services/             # Core business logic (Fraud Evaluation, Payout Calculus, Premium Logic)
-└── main.py               # Application entrypoint & scheduler execution
+|-- db/                   # Database schemas (OWNED SEPARATELY)
+|-- integrations/         # External service bindings (Weather, News, RazorPay)
+|-- models/               # Pydantic schemas (Data Contracts)
+|-- routers/              # Controller layer mapping out HTTP API paths
+|-- services/             # Business logic (Fraud, Payout, Premium Logic)
+|-- main.py               # Application entrypoint & scheduler
 ```
 
-## 🌐 Active API Endpoints
+## Active API Endpoints
 
 ### Workers & Auth
-
-- `POST /api/workers/register`: Calculate initial risk scores and provisions a worker alias.
-- `POST /api/workers/verify-upi`: Issues a standard penny-drop RazorPay command.
-- `GET /api/workers/{worker_id}`: Serves stable Worker Profiles satisfying the primary frontend load payload.
+- `POST /api/workers/register`: Calculates initial risk and provisions a worker alias.
+- `POST /api/workers/verify-upi`: Penny-drop RazorPay command.
+- `GET /api/workers/{worker_id}`: Retrieves worker profile.
 
 ### Claims & Payouts
-
-- `GET /api/claims/{worker_id}`: Locates historical claims made by a targeted worker.
-- `GET /api/claims/payout-ledger`: Administrative ledger resolving ledger tables for insurers.
-- `GET /api/claims/admin/fraud-queue`: Administrative route feeding the live fraud detector interception logs.
-- `POST /api/claims/admin/fraud/{id}`: Submits final manual verdicts (`CLEAN`, `HARD_FLAG`).
+- `GET /api/claims/{worker_id}`: Claims history.
+- `GET /api/claims/payout-ledger`: Admin payout view.
+- `GET /api/claims/admin/fraud-queue`: Live fraud interception queue.
+- `POST /api/claims/admin/fraud/{id}`: Submit manual verdicts (`CLEAN`, `HARD_FLAG`).
 
 ### Premium & Policies
-
-- `POST /api/premium/calculate`: Resolves dynamic weekly premium quotes relative to a worker's shift overlap.
-- `GET /api/policies/{worker_id}`: Surfaces active risk policies.
+- `POST /api/premium/calculate`: Dynamic weekly premium quotes.
+- `GET /api/policies/{worker_id}`: Surfacing active risk policies.
 
 ### Triggers & Simulation
+- `GET /api/triggers/active`: Currently running disruptions.
+- `POST /api/triggers/simulate`: Sandbox route for engine testing.
+- `GET /api/triggers/insurer/pool-health`: Metrics for insurers.
 
-- `GET /api/triggers/active`: Maps currently running geographical disruptions.
-- `POST /api/triggers/simulate`: Sandbox route triggering deterministic payouts or fraud intercepts to demonstrate engine resilience.
-- `GET /api/triggers/insurer/pool-health`: Metrics stream detailing reserve balances and logic parameters.
-
-## 🛠 Services & Business Logic
-
-- **`premium_calculator.py`**: Executes strict mathematical risk analysis based on external seasonal multipliers without relying on ambiguous machine-learning pipelines.
-- **`fraud_detector.py`**: A deterministic engine returning logical verdicts (`CLEAN`, `SOFT_FLAG`, `HARD_FLAG`, `AUTO_REJECT`) generated off specific metric permutations (e.g. `GPS_ZONE_MISMATCH`).
-- **`payout_engine.py`**: Implements basic chronological algebra to deduce hour overlap between shifts and environmental triggers, preventing breaches on maximum weekly payout caps.
-- **`trigger_monitor.py`**: Schedules routine integrations queries (`get_weather`) synthesizing live alerts safely translated for the frontend components.
-
-## 🚧 DB Ownership & Persistence-Ready Status
+## DB Ownership & Persistence-Ready Status
 
 The database connection pipelines and Supabase persistence schemas reside inside `backend/db/**/*`.
 **This boundary is owned by a separate team.**
 
 ### Current State: Persistence-Ready
-The backend has been refactored to be **Persistence-Ready**. All routers (`workers`, `policies`, `claims`, `triggers`) and services now use a dependency structure aligned with `schema.sql`.
+The backend is currently **Persistence-Ready**. All routers and services use a `get_db` dependency pattern.
 
-- **Internal UUID Ready**: Internal logic is prepared to handle UUIDs.
-- **External Contract Stability**: Public API IDs remain strings (e.g. `wrk_...`) to ensure 100% compatibility with the current frontend.
-- **Dependency Pattern**: Routes use a `get_db` dependency. When the DB Team provides a usable client, it can be plugged into `get_db` to immediately activate real persistence across the entire API.
+> [!CAUTION]
+> **Production Status: Deterministic Demo Mode**
+> - **Missing Client**: `backend/db/supabase.py` does not yet expose an initialized client.
+> - **Mock Fallback**: High-fidelity, deterministic logic is used instead of real DB calls.
+> - **Seeding**: `seed.py` is ready but will report `[BLOCKED]` until real .env keys are provided.
 
-## ⚙️ Development & Seeding
-
-Ensure commands are executed from the root of the monorepo.
+## Development & Seeding
 
 ```bash
 # Boot the FastAPI uvicorn daemon
@@ -75,8 +63,8 @@ python seed.py
 python seed.py --no-dry-run
 ```
 
-### 🛑 Persistence Blockers
+## Production Readiness Blockers
 
-- **Missing Runtime Client**: `backend/db/supabase.py` currently only provides configuration; no Supabase client instance is initialized.
-- **Credential Placeholders**: `.env` contains placeholders. Real persistence will fail with `[BLOCKED]` logs until valid `SUPABASE_URL` and `SUPABASE_KEY` are provided.
-- **Team Handover**: The "DB Team" must initialize the `supabase-py` client in `backend/db/supabase.py` to enable the "Persistence-Ready" routes.
+- **Backend Auth**: There is no `/api/auth/login` endpoint. Auth is currently simulated on the frontend.
+- **Persistence Activation**: The DB team must initialize the `supabase-py` client in `backend/db/` to enable the "Persistence-Ready" routes.
+- **Environment**: `.env` requires valid `SUPABASE_URL` and `SUPABASE_KEY`.
