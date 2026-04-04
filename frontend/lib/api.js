@@ -27,15 +27,21 @@ function normalizeWorkerPayload(data) {
 function normalizePremiumPayload(data) {
   const shiftStart = data.shift_start || data.shiftStart || "10:00";
   const shiftEnd = data.shift_end || data.shiftEnd || "22:00";
-  const shiftHours = Math.max(1, Number(shiftEnd.slice(0, 2)) - Number(shiftStart.slice(0, 2)));
+  
+  // Handle overnight shifts correctly
+  const startH = Number(shiftStart.split(":")[0]);
+  const endH = Number(shiftEnd.split(":")[0]);
+  let diff = endH - startH;
+  if (diff <= 0) diff += 24;
+  const shiftHours = diff;
 
   return {
     platform: data.platform,
     city: data.city,
     zone: data.zone,
-    weekly_earnings: data.weekly_earnings || data.earnings || data.weeklyEarnings,
-    shift_hours: data.shift_hours || shiftHours,
-    working_days: data.working_days || data.workingDays || 6,
+    weekly_earnings: Number(data.weekly_earnings || data.earnings || data.weeklyEarnings || 0),
+    shift_hours: Number(data.shift_hours || shiftHours),
+    working_days: Number(data.working_days || data.workingDays || 6),
     month: data.month || new Date().getMonth() + 1,
   };
 }

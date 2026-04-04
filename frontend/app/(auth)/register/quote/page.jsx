@@ -35,11 +35,20 @@ export default function RegisterQuotePage() {
             weeklyPremium: res.weekly_premium,
             riskTier: res.risk_tier,
             coveragePct: res.coverage_pct,
-            maxPayout: res.max_payout
+            maxPayout: res.max_payout,
+            baseRate: res.base_rate,
+            riskMultiplier: res.risk_multiplier,
+            seasonMultiplier: res.season_multiplier
           });
         } else {
           // Fallback to local logic if API is completely unreachable
-          setQuote(calculatePremiumPreview(data));
+          const fallback = calculatePremiumPreview(data);
+          setQuote({
+            ...fallback,
+            baseRate: data.earnings * 0.022,
+            riskMultiplier: fallback.riskTier === "HIGH" ? 1.15 : fallback.riskTier === "MEDIUM" ? 1.00 : 0.80,
+            seasonMultiplier: 1.00
+          });
         }
       }
       fetchQuote();
@@ -104,9 +113,8 @@ export default function RegisterQuotePage() {
                   { label: "Name", value: regData.name },
                   { label: "Platform", value: regData.platform },
                   { label: "City · Zone", value: `${regData.city} · ${regData.zone}` },
-                  { label: "Weekly Earnings", value: `₹${regData.earnings?.toLocaleString("en-IN")}` },
+                  { label: "Weekly Earnings", value: `₹${Number(regData.earnings || 0).toLocaleString("en-IN")}` },
                   { label: "Risk Tier", value: <Badge variant={quote.riskTier === "HIGH" ? "danger" : quote.riskTier === "MEDIUM" ? "warning" : "success"}>{quote.riskTier}</Badge> },
-                  { label: "Verification Tier", value: `Tier ${regData.verificationTier || 1}` },
                   { label: "Coverage", value: `${quote.coveragePct || 75}%` },
                   { label: "Max Weekly Payout", value: <span className="font-currency font-bold text-primary">₹{quote.maxPayout?.toLocaleString("en-IN")}</span> },
                 ].map((row) => (
@@ -115,6 +123,25 @@ export default function RegisterQuotePage() {
                     <span className="font-semibold text-on-surface">{row.value}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Advanced Calculation Breakdown */}
+              <div className="bg-surface-container-highest/30 rounded-xl p-4 space-y-3">
+                <p className="text-[10px] font-bold text-outline uppercase tracking-widest">Premium Calculation Breakdown</p>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-[10px] text-on-surface-variant uppercase">Base Rate</p>
+                    <p className="font-currency font-bold text-sm text-on-surface">₹{quote.baseRate?.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-on-surface-variant uppercase">Risk Multiplier</p>
+                    <p className="font-bold text-sm text-on-surface">{quote.riskMultiplier}x</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-on-surface-variant uppercase">Season Factor</p>
+                    <p className="font-bold text-sm text-on-surface">{quote.seasonMultiplier}x</p>
+                  </div>
+                </div>
               </div>
 
               {/* UPI status */}

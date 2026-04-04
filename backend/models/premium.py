@@ -17,7 +17,7 @@ class PremiumCalculationRequest(BaseModel):
     weekly_earnings: float = Field(gt=0)
     shift_hours: float = Field(gt=0)
     working_days: int = Field(ge=1, le=7)
-    month: int = Field(ge=1, le=12)
+    month: int | None = Field(default=None, ge=1, le=12)
 
 
 # ---------------------------------------------------------------------------

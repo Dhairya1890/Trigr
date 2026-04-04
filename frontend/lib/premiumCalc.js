@@ -9,7 +9,7 @@ export function calculatePremiumPreview(data) {
 
   const { earnings = 4500, city, zone, shiftStart, shiftEnd, platform, verificationTier = 1 } = data;
 
-  let base = earnings * 0.02; // 2% of earnings
+  let base = earnings * 0.022; // 2.2% of earnings (aligned with backend)
   let riskScore = 40; // Base risk score 0-100
 
   // Zone risk

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from backend.services.risk_scorer import score_risk
 
@@ -9,8 +9,8 @@ TIER_CAPS = {"Tier 1": 2000, "Tier 2": 3500, "Tier 3": 5000}
 
 def calculate_weekly_premium(payload: dict) -> dict:
     risk = score_risk(payload["city"], payload["zone"], payload["platform"], payload["month"])
-    base_premium = round(payload["weekly_earnings"] * 0.022, 2)
-    season_factor = (
+    base_rate = round(payload["weekly_earnings"] * 0.022, 2)
+    season_multiplier = (
         1.15
         if payload["month"] in {6, 7, 8, 9}
         else 1.10
@@ -18,20 +18,20 @@ def calculate_weekly_premium(payload: dict) -> dict:
         else 1.00
     )
     loyalty_discount = 1.00
-    weekly_premium = round(base_premium * RISK_MULTIPLIERS[risk["risk_tier"]] * season_factor * loyalty_discount)
+    weekly_premium = round(base_rate * RISK_MULTIPLIERS[risk["risk_tier"]] * season_multiplier * loyalty_discount)
     tier = "Tier 2"
     coverage_pct = COVERAGE_PCT[risk["risk_tier"]]
     max_payout = min(round(payload["weekly_earnings"] * coverage_pct), TIER_CAPS[tier])
 
     return {
         **risk,
-        "base_premium": base_premium,
+        "base_rate": base_rate,
         "risk_multiplier": RISK_MULTIPLIERS[risk["risk_tier"]],
-        "season_factor": season_factor,
+        "season_multiplier": season_multiplier,
         "loyalty_discount": loyalty_discount,
         "weekly_premium": weekly_premium,
         "max_payout": max_payout,
         "coverage_pct": coverage_pct,
         "tier": tier,
-        "calculation_date": datetime.now().isoformat(),
+        "calculation_date": datetime.now(timezone.utc).isoformat(),
     }

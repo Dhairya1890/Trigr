@@ -17,21 +17,25 @@ backend/
 ## Active API Endpoints
 
 ### Workers & Auth
+
 - `POST /api/workers/register`: Calculates initial risk and provisions a worker alias.
 - `POST /api/workers/verify-upi`: Penny-drop RazorPay command.
 - `GET /api/workers/{worker_id}`: Retrieves worker profile.
 
 ### Claims & Payouts
+
 - `GET /api/claims/{worker_id}`: Claims history.
 - `GET /api/claims/payout-ledger`: Admin payout view.
 - `GET /api/claims/admin/fraud-queue`: Live fraud interception queue.
 - `POST /api/claims/admin/fraud/{id}`: Submit manual verdicts (`CLEAN`, `HARD_FLAG`).
 
 ### Premium & Policies
+
 - `POST /api/premium/calculate`: Dynamic weekly premium quotes.
 - `GET /api/policies/{worker_id}`: Surfacing active risk policies.
 
 ### Triggers & Simulation
+
 - `GET /api/triggers/active`: Currently running disruptions.
 - `POST /api/triggers/simulate`: Sandbox route for engine testing.
 - `GET /api/triggers/insurer/pool-health`: Metrics for insurers.
@@ -42,10 +46,12 @@ The database connection pipelines and Supabase persistence schemas reside inside
 **This boundary is owned by a separate team.**
 
 ### Current State: Persistence-Ready
+
 The backend is currently **Persistence-Ready**. All routers and services use a `get_db` dependency pattern.
 
 > [!CAUTION]
 > **Production Status: Deterministic Demo Mode**
+>
 > - **Missing Client**: `backend/db/supabase.py` does not yet expose an initialized client.
 > - **Mock Fallback**: High-fidelity, deterministic logic is used instead of real DB calls.
 > - **Seeding**: `seed.py` is ready but will report `[BLOCKED]` until real .env keys are provided.
