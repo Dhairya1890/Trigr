@@ -1,44 +1,40 @@
 export function calculatePremiumPreview(data) {
-  // Logic from README:
-  // Base Premium = 2% of Weekly Earnings
-  // Adjustments:
-  // - High Risk Zone (e.g. Dharavi, Kurla): +15%
-  // - High Risk Platform: +5%
-  // - Night Shift: +10%
-  // - Verification Discount: Tier 2 (-5%), Tier 3 (-10%)
+  const { earnings = 4500, city, zone, platform, verificationTier = 1 } = data;
 
-  const { earnings = 4500, city, zone, shiftStart, shiftEnd, platform, verificationTier = 1 } = data;
+  const baseRate = earnings * 0.022; // Aligned with backend formula
+  let riskMultiplier = 1.00;
+  let seasonMultiplier = 1.00;
 
-  let base = earnings * 0.022; // 2.2% of earnings (aligned with backend)
-  let riskScore = 40; // Base risk score 0-100
+  // High-fidelity risk assessment logic for the demo
+  const highRiskZones = ["Dharavi", "Kurla", "Lalbagh", "Seelampur"];
+  const medRiskZones = ["Lajpat Nagar", "HSR Layout", "Salt Lake"];
 
-  // Zone risk
-  const highRiskZones = ["Dharavi", "Kurla", "Lajpat Nagar", "HSR Layout"];
-  if (highRiskZones.includes(zone)) {
-    base *= 1.15;
-    riskScore += 20;
+  if (highRiskZones.some(z => zone?.includes(z))) riskMultiplier = 1.15;
+  else if (medRiskZones.some(z => zone?.includes(z))) riskMultiplier = 1.05;
+
+  if (["swiggy", "zomato", "blinkit"].includes(platform?.toLowerCase())) {
+    riskMultiplier += 0.05;
   }
 
-  // Shift risk (Night shifts 10pm-6am or long shifts)
-  const isNight = Number((shiftEnd || "22:00").split(":")[0]) > 22 || Number((shiftStart || "10:00").split(":")[0]) < 6;
-  if (isNight) {
-    base *= 1.10;
-    riskScore += 10;
-  }
+  // Seasonality randomness for a "live" feel
+  const month = new Date().getMonth();
+  if (month >= 5 && month <= 8) seasonMultiplier = 1.15; // Monsoon premium
+  else if (city === "Delhi" && month >= 10 || month <= 1) seasonMultiplier = 1.10; // Fog/Air Quality surcharge
+  else seasonMultiplier = 1.00;
 
-  // Verification discount
-  if (verificationTier === 2) base *= 0.95;
-  if (verificationTier === 3) base *= 0.90;
+  const weeklyPremium = Math.round(baseRate * riskMultiplier * seasonMultiplier);
 
   // Coverage cap based on Tier
   const caps = { 1: 2000, 2: 3500, 3: 5000 };
-  const maxPayout = caps[verificationTier] || 2000;
+  const maxPayout = caps[verificationTier] || 2500;
 
   return {
-    weeklyPremium: Math.round(base),
-    riskTier: riskScore > 70 ? "HIGH" : riskScore > 40 ? "MEDIUM" : "LOW",
-    riskScore,
+    weeklyPremium,
+    riskTier: riskMultiplier >= 1.15 ? "HIGH" : riskMultiplier >= 1.05 ? "MEDIUM" : "LOW",
     maxPayout,
-    coveragePct: 75 + (verificationTier * 5), // 80%, 85%, 90%
+    coveragePct: 75 + (verificationTier * 5),
+    baseRate,
+    riskMultiplier: Number(riskMultiplier.toFixed(2)),
+    seasonMultiplier: Number(seasonMultiplier.toFixed(2))
   };
 }

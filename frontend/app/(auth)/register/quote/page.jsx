@@ -16,55 +16,47 @@ import { api } from "@/lib/api";
 export default function RegisterQuotePage() {
   const router = useRouter();
   const { signup, loading: authLoading } = useAuth();
-  
-  // Instant synchronous initialization for "Zero-Wait" performance
-  const [regData, setRegData] = useState(() => {
-    if (typeof window === "undefined") return null;
-    const saved = localStorage.getItem("trigr_reg");
-    if (!saved) return null;
-    try {
-      return JSON.parse(saved);
-    } catch (e) {
-      return null;
-    }
-  });
-
-  const [quote, setQuote] = useState(() => {
-    if (!regData) return null;
-    const fallback = calculatePremiumPreview(regData);
-    return {
-      ...fallback,
-      baseRate: regData.earnings * 0.022,
-      riskMultiplier: fallback.riskTier === "HIGH" ? 1.15 : fallback.riskTier === "MEDIUM" ? 1.00 : 0.80,
-      seasonMultiplier: 1.00
-    };
-  });
-
+  const [mounted, setMounted] = useState(false);
+  const [regData, setRegData] = useState(null);
+  const [quote, setQuote] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!regData) {
+    setMounted(true);
+    const saved = localStorage.getItem("trigr_reg");
+    if (!saved) {
       router.push("/register");
       return;
     }
 
-    // Silent background fetch to verify with backend
-    async function fetchQuote() {
-      const res = await api.calculatePremium(regData);
-      if (res) {
-        setQuote({
-          weeklyPremium: res.weekly_premium,
-          riskTier: res.risk_tier,
-          coveragePct: res.coverage_pct,
-          maxPayout: res.max_payout,
-          baseRate: res.base_rate,
-          riskMultiplier: res.risk_multiplier,
-          seasonMultiplier: res.season_multiplier
-        });
+    try {
+      const data = JSON.parse(saved);
+      setRegData(data);
+      
+      // Calculate instant preview
+      const preview = calculatePremiumPreview(data);
+      setQuote(preview);
+
+      // Silent background fetch to verify with backend
+      async function fetchQuote() {
+        const res = await api.calculatePremium(data);
+        if (res) {
+          setQuote({
+            weeklyPremium: res.weekly_premium,
+            riskTier: res.risk_tier,
+            coveragePct: res.coverage_pct,
+            maxPayout: res.max_payout,
+            baseRate: res.base_rate,
+            riskMultiplier: res.risk_multiplier,
+            seasonMultiplier: res.season_multiplier
+          });
+        }
       }
+      fetchQuote();
+    } catch (e) {
+      router.push("/register");
     }
-    fetchQuote();
-  }, [regData, router]);
+  }, [router]);
 
   async function handlePurchase() {
     setError("");
@@ -88,7 +80,7 @@ export default function RegisterQuotePage() {
     }
   }
 
-  if (!regData || !quote) return (
+  if (!mounted || !regData || !quote) return (
     <div className="min-h-screen flex items-center justify-center bg-surface">
       <Loader2 className="w-8 h-8 animate-spin text-primary-container" />
     </div>
