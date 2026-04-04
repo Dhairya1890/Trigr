@@ -1,30 +1,55 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import { api } from "@/lib/api";
 
 export default function useDisruptions(city = "Mumbai") {
   const [activeEvents, setActiveEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    async function load() {
+    let cancelled = false;
+
+    async function load({ silent = false } = {}) {
       try {
-        setLoading(true);
+        if (!silent && !hasLoadedRef.current) {
+          setLoading(true);
+        }
         const data = await api.getActiveTriggers();
-        if (data && data.events) {
-          setActiveEvents(data.events);
-        } else {
-          setActiveEvents([]);
+        const events = data?.events || [];
+        const filteredEvents =
+          city === "all"
+            ? events
+            : events.filter((event) => event.city === city);
+
+        if (!cancelled) {
+          setActiveEvents(filteredEvents);
+          hasLoadedRef.current = true;
         }
       } catch (err) {
-        setError(err.message);
+        if (!cancelled) {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
+
     load();
+    const onSimulation = () => load({ silent: true });
+    window.addEventListener("trigr:simulation", onSimulation);
+    const intervalId = window.setInterval(() => load({ silent: true }), 5000);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("trigr:simulation", onSimulation);
+      window.clearInterval(intervalId);
+    };
   }, [city]);
 
   return { activeEvents, loading, error };

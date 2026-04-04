@@ -1,19 +1,19 @@
 import { cn } from "@/components/ui/button";
 
 const variants = {
-  default: "bg-primary-container/10 text-primary-container",
-  success: "bg-success/10 text-success",
-  warning: "bg-warning/10 text-warning",
-  danger:  "bg-error/10 text-error",
-  muted:   "bg-surface-container text-outline",
-  outline: "bg-transparent border border-outline-variant text-outline",
+  default: "bg-primary/10 text-primary border-primary/20",
+  success: "bg-success/10 text-success border-success/20",
+  warning: "bg-warning/10 text-warning border-warning/20",
+  danger:  "bg-error/10 text-error border-error/20",
+  muted:   "bg-surface-container text-outline border-outline/20",
+  outline: "bg-transparent border border-outline text-outline",
 };
 
 export function Badge({ variant = "default", className, children, ...props }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap",
+        "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border",
         variants[variant] || variants.default,
         className
       )}

@@ -19,40 +19,48 @@ export default function WeatherWidget({ weather }) {
     data.aqi > 100 ? "text-warning" : "text-success";
 
   return (
-    <Card>
-      <CardContent className="p-6 space-y-4">
+    <Card hover className="overflow-hidden border-none shadow-elevated bg-surface-container-low/50">
+      <CardContent className="p-6 md:p-8 space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-headline font-bold text-sm">{data.city} Weather</h3>
-            <p className="text-xs text-on-surface-variant">{data.condition}</p>
+            <h3 className="font-headline font-black text-base text-on-surface">{data.city} Weather</h3>
+            <p className="text-xs font-bold text-on-surface-variant flex items-center gap-1.5 mt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              {data.condition}
+            </p>
           </div>
-          <CloudRain className="w-6 h-6 text-primary-container" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-lg bg-surface-container-low space-y-1">
-            <div className="flex items-center gap-1 text-xs text-outline">
-              <Thermometer className="w-3 h-3" /> Temperature
-            </div>
-            <p className="font-headline font-bold text-lg">{data.temp}</p>
-          </div>
-          <div className="p-3 rounded-lg bg-surface-container-low space-y-1">
-            <div className="flex items-center gap-1 text-xs text-outline">
-              <Wind className="w-3 h-3" /> Wind
-            </div>
-            <p className="font-headline font-bold text-lg">{data.windSpeed}</p>
+          <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center">
+            <CloudRain className="w-6 h-6 text-primary" />
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-2 border-t border-outline-variant/10">
-          <div className="text-xs text-outline">AQI</div>
-          <div className={`font-headline font-bold ${aqiColor}`}>
-            {data.aqi} <span className="text-xs font-normal text-on-surface-variant">({data.aqiLabel})</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-2xl bg-surface-container-lowest/80 border border-outline-variant/10 space-y-1.5">
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-outline">
+              <Thermometer className="w-3.5 h-3.5" /> Temp
+            </div>
+            <p className="font-headline font-black text-xl text-on-surface">{data.temp}</p>
+          </div>
+          <div className="p-4 rounded-2xl bg-surface-container-lowest/80 border border-outline-variant/10 space-y-1.5">
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-outline">
+              <Wind className="w-3.5 h-3.5" /> Wind
+            </div>
+            <p className="font-headline font-black text-xl text-on-surface">{data.windSpeed}</p>
           </div>
         </div>
-        <div className="flex justify-between items-center">
-          <div className="text-xs text-outline">Rainfall (3h)</div>
-          <div className="font-headline font-bold text-sm">{data.rainfall3h}</div>
+
+        <div className="space-y-3 pt-4 border-t border-outline-variant/10">
+          <div className="flex justify-between items-center px-1">
+            <div className="text-[10px] uppercase tracking-widest font-black text-outline">Air Quality</div>
+            <div className={`text-sm font-black flex items-center gap-2 ${aqiColor}`}>
+              <span className={`w-2 h-2 rounded-full ${aqiColor.replace('text-', 'bg-')}`}></span>
+              {data.aqi} <span className="text-[10px] font-bold opacity-80">({data.aqiLabel})</span>
+            </div>
+          </div>
+          <div className="flex justify-between items-center px-1">
+            <div className="text-[10px] uppercase tracking-widest font-black text-outline">Rainfall (3h)</div>
+            <div className="text-sm font-black text-on-surface">{data.rainfall3h}</div>
+          </div>
         </div>
       </CardContent>
     </Card>

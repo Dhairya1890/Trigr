@@ -1,31 +1,34 @@
 import { AlertTriangle, CloudRain, Wind } from "lucide-react";
 
+import { StatusBadge } from "@/components/ui/badge";
+
 export default function DisruptionBanner({ event }) {
   if (!event) return null;
 
   const icons = {
     "Heavy Rain": CloudRain,
     "Flood Alert": AlertTriangle,
-    "Cyclone": Wind,
+    Cyclone: Wind,
+    "Severe Aqi": AlertTriangle,
+    "Local Curfew": AlertTriangle,
   };
   const Icon = icons[event.type] || AlertTriangle;
 
   return (
-    <div className="bg-tertiary-container/10 border border-tertiary-container/30 rounded-xl p-4 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center shrink-0">
-        <Icon className="w-5 h-5 text-tertiary-container" />
+    <div className="flex items-center gap-4 rounded-2xl border border-warning/20 bg-warning/8 p-4 shadow-sm dark:border-warning/20 dark:bg-surface-container-high/80">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning/15 text-warning dark:bg-warning/10">
+        <Icon className="h-5 w-5" />
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-headline font-bold text-sm text-on-surface">
-          {event.type} — {event.city}
+      <div className="min-w-0 flex-1">
+        <p className="font-headline text-sm font-bold text-on-surface">
+          {event.type} in {event.zone || event.city}
         </p>
-        <p className="text-xs text-on-surface-variant truncate">
-          {event.zones?.join(", ")} · Since {event.since || "2:00 PM"}
+        <p className="truncate text-xs text-on-surface-variant">
+          {event.zone || "Affected zones updating"} · Since{" "}
+          {event.timestamp ? new Date(event.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "now"}
         </p>
       </div>
-      <span className="shrink-0 px-3 py-1 rounded-full bg-tertiary-container text-white text-xs font-bold">
-        ACTIVE
-      </span>
+      <StatusBadge status="ACTIVE" className="shrink-0" />
     </div>
   );
 }

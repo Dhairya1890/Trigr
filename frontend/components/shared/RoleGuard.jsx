@@ -12,9 +12,11 @@ export default function RoleGuard({ children, requiredRole }) {
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
+    // Wait for AuthProvider to finish restoring from localStorage
     if (loading) return;
 
     if (!isAuthenticated) {
+      console.log("[RoleGuard] Not authenticated, redirecting to login");
       router.replace("/login");
       return;
     }
@@ -28,11 +30,11 @@ export default function RoleGuard({ children, requiredRole }) {
     }
 
     if (expectedRole && role !== expectedRole) {
-      console.warn(`Unauthorized access attempt. Role: ${role}, Required: ${expectedRole}`);
-      // Redirect to correct dashboard based on actual role
-      if (role === "admin") router.replace("/admin");
-      else if (role === "insurer") router.replace("/insurer");
-      else router.replace("/worker");
+      console.warn(`[RoleGuard] Unauthorized access attempt. Role: ${role}, Expected: ${expectedRole}`);
+      // Redirect to correct dashboard based on actual role to prevent "locked" state
+      if (role === "admin") router.replace("/admin/analytics");
+      else if (role === "insurer") router.replace("/insurer/dashboard");
+      else router.replace("/worker/dashboard");
     } else {
       setAuthorized(true);
     }

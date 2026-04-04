@@ -10,10 +10,13 @@
     "build": "npm run build --workspace frontend",
     "lint": "npm run lint --workspace frontend",
     "backend:dev": "python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000",
-    "backend:install": "python -m pip install --user -r backend/requirements.txt",
-    "seed": "python seed.py"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.101.1"
+    "backend:install": "python -m pip install -r backend/requirements.txt",
+    "backend:lint": "python -m ruff check backend/ seed.py",
+    "backend:format": "python -m ruff format backend/ seed.py",
+    "backend:format:check": "python -m ruff format --check backend/ seed.py",
+    "seed": "python seed.py",
+    "seed:export": "python seed.py --export-json",
+    "lint:all": "npm run lint && npm run backend:lint",
+    "check:all": "npm run lint:all && npm run build && npm run backend:format:check"
   }
 }

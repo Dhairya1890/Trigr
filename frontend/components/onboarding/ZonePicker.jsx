@@ -1,15 +1,7 @@
-const cityZones = {
-  Mumbai: ["Dharavi", "Kurla", "Sion", "Andheri East", "Dadar", "Bandra"],
-  Delhi: ["Connaught Place", "Lajpat Nagar", "Sarojini Nagar", "Karol Bagh", "Dwarka", "Rohini"],
-  Bangalore: ["Koramangala", "Whitefield", "Indiranagar", "HSR Layout", "Jayanagar", "Electronic City"],
-  Chennai: ["T. Nagar", "Adyar", "Velachery", "Anna Nagar", "Mylapore", "Tambaram"],
-  Kolkata: ["Salt Lake", "Park Street", "Howrah", "Dum Dum", "New Town", "Jadavpur"],
-};
-
-const cities = Object.keys(cityZones);
+import { CITY_OPTIONS, CITY_ZONES } from "@/lib/locations";
 
 export default function ZonePicker({ city, zone, onCityChange, onZoneChange }) {
-  const zones = city ? cityZones[city] || [] : [];
+  const zones = city ? CITY_ZONES[city] || [] : [];
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -21,7 +13,7 @@ export default function ZonePicker({ city, zone, onCityChange, onZoneChange }) {
           className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all text-sm text-on-surface"
         >
           <option value="" className="bg-surface text-on-surface">Select city</option>
-          {cities.map((c) => (
+          {CITY_OPTIONS.map((c) => (
             <option key={c} value={c} className="bg-surface text-on-surface">{c}</option>
           ))}
         </select>

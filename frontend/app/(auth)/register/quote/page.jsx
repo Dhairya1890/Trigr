@@ -11,6 +11,7 @@ import StepIndicator from "@/components/onboarding/StepIndicator";
 import { calculatePremiumPreview } from "@/lib/premiumCalc";
 import { ShieldCheck, Loader2, CircleCheckBig } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 
 export default function RegisterQuotePage() {
   const router = useRouter();
@@ -25,7 +26,23 @@ export default function RegisterQuotePage() {
     try {
       const data = JSON.parse(saved);
       setRegData(data);
-      setQuote(calculatePremiumPreview(data));
+      
+      // Fetch dynamic quote from API
+      async function fetchQuote() {
+        const res = await api.calculatePremium(data);
+        if (res) {
+          setQuote({
+            weeklyPremium: res.weekly_premium,
+            riskTier: res.risk_tier,
+            coveragePct: res.coverage_pct,
+            maxPayout: res.max_payout
+          });
+        } else {
+          // Fallback to local logic if API is completely unreachable
+          setQuote(calculatePremiumPreview(data));
+        }
+      }
+      fetchQuote();
     } catch (e) {
       router.push("/register");
     }

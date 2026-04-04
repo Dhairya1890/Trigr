@@ -6,7 +6,39 @@
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-const IS_DEMO_MODE = true; // Force demo mode for stable presentation if backend is flaky
+const IS_DEMO_MODE = true; // When true, static data is used as a fallback if the backend is unreachable.
+
+function normalizeWorkerPayload(data) {
+  return {
+    name: data.name,
+    phone: data.phone,
+    platform: data.platform,
+    city: data.city,
+    zone: data.zone,
+    shift_start: data.shift_start || data.shiftStart,
+    shift_end: data.shift_end || data.shiftEnd,
+    working_days: data.working_days || data.workingDays,
+    weekly_earnings: data.weekly_earnings || data.earnings || data.weeklyEarnings,
+    upi_id: data.upi_id || data.upi,
+    role: data.role || "worker",
+  };
+}
+
+function normalizePremiumPayload(data) {
+  const shiftStart = data.shift_start || data.shiftStart || "10:00";
+  const shiftEnd = data.shift_end || data.shiftEnd || "22:00";
+  const shiftHours = Math.max(1, Number(shiftEnd.slice(0, 2)) - Number(shiftStart.slice(0, 2)));
+
+  return {
+    platform: data.platform,
+    city: data.city,
+    zone: data.zone,
+    weekly_earnings: data.weekly_earnings || data.earnings || data.weeklyEarnings,
+    shift_hours: data.shift_hours || shiftHours,
+    working_days: data.working_days || data.workingDays || 6,
+    month: data.month || new Date().getMonth() + 1,
+  };
+}
 
 async function fetcher(endpoint, options = {}) {
   try {
@@ -17,27 +49,41 @@ async function fetcher(endpoint, options = {}) {
         ...options.headers,
       },
     });
-    if (!res.ok) throw new Error(`API Error: ${res.status}`);
+    if (!res.ok) {
+      console.warn(`[API] Backend returned error ${res.status} for ${endpoint}`);
+      return null;
+    }
     return await res.json();
   } catch (err) {
-    console.warn(`[API] Fetcher error for ${endpoint}:`, err.message);
+    if (IS_DEMO_MODE) {
+      console.info(`[API] Backend unreachable at ${endpoint}. Cascading to demo fallback payload.`);
+    } else {
+      console.error(`[API] Connection failed for ${endpoint}:`, err.message);
+    }
     return null;
   }
 }
 
 export const api = {
   // --- AUTH & REGISTRATION ---
+  // Auth is handled locally in AuthContext for this demo phase.
+  // We include these here for future backend connectivity.
   login: async (credentials) => {
-    // Demo-only auth logic
-    localStorage.setItem("trigr_role", credentials.role || "worker");
-    localStorage.setItem("trigr_user", JSON.stringify({ name: "Demo User", id: "wrk_demo" }));
+    // Attempt real fetch first if backend ever adds an auth route
+    const res = await fetcher("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    if (res || !IS_DEMO_MODE) return res;
+    
+    // Explicit demo fallback
     return { token: "demo-token", role: credentials.role || "worker" };
   },
 
   registerWorker: async (data) => {
     const res = await fetcher("/workers/register", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(normalizeWorkerPayload(data)),
     });
     if (res || !IS_DEMO_MODE) return res;
     
@@ -51,10 +97,10 @@ export const api = {
     };
   },
 
-  verifyUPI: async (upi_id, worker_id) => {
+  verifyUPI: async (upiId, workerId) => {
     const res = await fetcher("/workers/verify-upi", {
       method: "POST",
-      body: JSON.stringify({ upi_id, worker_id }),
+      body: JSON.stringify({ upi_id: upiId, worker_id: workerId }),
     });
     if (res !== null || !IS_DEMO_MODE) return res;
     return { verified: true, message: "UPI verified (Demo Mode)" };
@@ -64,11 +110,11 @@ export const api = {
   calculatePremium: async (data) => {
     const res = await fetcher("/premium/calculate", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(normalizePremiumPayload(data)),
     });
     if (res || !IS_DEMO_MODE) return res;
     
-    // Fallback logic matching lib/premiumCalc.js
+    // Fallback logic
     return {
       weekly_premium: 131,
       risk_tier: "LOW",
@@ -108,13 +154,42 @@ export const api = {
     };
   },
 
-  // --- TRIGGERS & SIMULATION ---
+  // --- WEATHER & TRIGGERS ---
+  getWeather: async (city = "Mumbai") => {
+    const res = await fetcher(`/triggers/weather?city=${city}`);
+    if (res || !IS_DEMO_MODE) return res;
+    
+    // Centralized high-fidelity weather fallback
+    return {
+      city: city,
+      temp: "29°C",
+      humidity: "82%",
+      windSpeed: "18 km/h",
+      condition: "Partly Cloudy",
+      aqi: 85,
+      aqiLabel: "Moderate",
+      rainfall3h: "2.4mm",
+      last_updated: new Date().toLocaleTimeString(),
+    };
+  },
+
   getActiveTriggers: async () => {
     const res = await fetcher("/triggers/active");
     if (res || !IS_DEMO_MODE) return res;
     return {
       events: [
-        { id: "evt_1", type: "Heavy Rain", zone: "Dharavi", severity: "HIGH", timestamp: new Date().toISOString() }
+        {
+          id: "evt_1",
+          type: "Heavy Rain",
+          city: "Mumbai",
+          zone: "Dharavi",
+          zones: ["Dharavi"],
+          severity: "HIGH",
+          status: "ACTIVE",
+          totalPayout: 250,
+          workersAffected: 1,
+          timestamp: new Date().toISOString(),
+        }
       ]
     };
   },
@@ -142,13 +217,45 @@ export const api = {
     };
   },
   
+  getPayoutLedger: async () => {
+    const res = await fetcher("/claims/payout-ledger");
+    if (res || !IS_DEMO_MODE) return res;
+    return {
+      payouts: [
+        { id: "PAY-9011", workerId: "WRK-001", eventType: "Heavy Rain", amount: 250, utr: "9021445120XP", date: "Apr 14, 2026", status: "PAID" },
+        { id: "PAY-9012", workerId: "WRK-142", eventType: "Flood Alert", amount: 1500, utr: "9021445121XP", date: "Apr 14, 2026", status: "PROCESSING" },
+        { id: "PAY-9013", workerId: "WRK-882", eventType: "Cyclone", amount: 3200, utr: "9021445122XP", date: "Apr 13, 2026", status: "PAID" },
+        { id: "PAY-9014", workerId: "WRK-044", eventType: "Heavy Rain", amount: 450, utr: "9021445123XP", date: "Apr 13, 2026", status: "PAID" },
+        { id: "PAY-9015", workerId: "WRK-109", eventType: "AQI Hazard", amount: 180, utr: "9021445124XP", date: "Apr 12, 2026", status: "PAID" },
+      ]
+    };
+  },
+
   getFraudQueue: async () => {
     const res = await fetcher("/claims/admin/fraud-queue");
     if (res || !IS_DEMO_MODE) return res;
     return {
       claims: [
-        { id: "CLM-901", workerId: "WRK-442", type: "GPS_SPOOFED", confidence: 0.88, status: "PENDING" },
-        { id: "CLM-902", workerId: "WRK-109", type: "INCONSISTENT_SPEED", confidence: 0.72, status: "PENDING" },
+        { 
+          id: "CLM-901", 
+          workerId: "WRK-442", 
+          workerName: "Ravi Kumar",
+          type: "GPS_SPOOFED", 
+          score: 88,
+          signals: ["Location Mismatch", "High Velocity"],
+          confidence: 0.88, 
+          status: "PENDING" 
+        },
+        { 
+          id: "CLM-902", 
+          workerId: "WRK-109", 
+          workerName: "Sunita Singh",
+          type: "INCONSISTENT_SPEED", 
+          score: 72,
+          signals: ["Rapid movement"],
+          confidence: 0.72, 
+          status: "PENDING" 
+        },
       ]
     };
   },

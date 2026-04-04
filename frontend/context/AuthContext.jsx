@@ -34,31 +34,44 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const res = await api.login(credentials);
-      if (res) {
-        // More elegant name parsing for demo accounts
-        let displayName = "Demo User";
-        if (credentials.email?.includes("worker")) displayName = "Ravi Kumar";
-        else if (credentials.email?.includes("insurer")) displayName = "Insurer Admin";
-        else if (credentials.email?.includes("admin")) displayName = "System Admin";
-        else if (credentials.email) displayName = credentials.email.split("@")[0];
+      // For this phase, handle demo auth explicitly and cleanly.
+      // In a real app, this would be an api.login(credentials) fetch.
+      // We parse the email to determine the demo role.
+      let detectedRole = "worker";
+      let displayName = "Demo User";
 
-        const userData = { id: res.worker_id || "demo_user", name: displayName };
-        setUser(userData);
-        setRole(res.role);
-        setIsAuthenticated(true);
-        
-        localStorage.setItem("trigr_user", JSON.stringify(userData));
-        localStorage.setItem("trigr_role", res.role);
-        
-        // Redirect based on role to specific dashboards
-        if (res.role === "admin") router.push("/admin/analytics");
-        else if (res.role === "insurer") router.push("/insurer/dashboard");
-        else router.push("/worker/dashboard");
-        
-        return { success: true };
+      if (credentials.email?.includes("admin")) {
+        detectedRole = "admin";
+        displayName = "System Admin";
+      } else if (credentials.email?.includes("insurer")) {
+        detectedRole = "insurer";
+        displayName = "Insurer Admin";
+      } else if (credentials.email?.includes("worker")) {
+        detectedRole = "worker";
+        displayName = "Ravi Kumar";
+      } else if (credentials.email) {
+        displayName = credentials.email.split("@")[0];
       }
-      return { success: false, error: "Invalid credentials" };
+
+      const userData = {
+        id: detectedRole === "worker" ? "me" : `${detectedRole}_demo`,
+        name: displayName,
+        email: credentials.email || "",
+      };
+      
+      setUser(userData);
+      setRole(detectedRole);
+      setIsAuthenticated(true);
+      
+      localStorage.setItem("trigr_user", JSON.stringify(userData));
+      localStorage.setItem("trigr_role", detectedRole);
+      
+      // Redirect based on role
+      if (detectedRole === "admin") router.push("/admin/analytics");
+      else if (detectedRole === "insurer") router.push("/insurer/dashboard");
+      else router.push("/worker/dashboard");
+      
+      return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     } finally {
@@ -80,13 +93,16 @@ export function AuthProvider({ children }) {
     try {
       const res = await api.registerWorker(data);
       if (res) {
-        const userData = { id: res.worker_id, name: data.name };
+        const userData = { id: res.worker_id, name: data.name, email: data.email || "" };
         setUser(userData);
         setRole("worker");
         setIsAuthenticated(true);
         
         localStorage.setItem("trigr_user", JSON.stringify(userData));
         localStorage.setItem("trigr_role", "worker");
+        
+        // Post-signup redirect
+        router.push("/worker/dashboard");
         
         return { success: true, data: res };
       }

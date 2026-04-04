@@ -24,13 +24,10 @@ app = FastAPI(title="Trigr API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://trigr.vercel.app"
-    ],
+    allow_origins=["http://localhost:3000", "https://trigr.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 app.include_router(workers.router, prefix="/api/workers", tags=["workers"])
@@ -43,4 +40,3 @@ app.include_router(premium.router, prefix="/api/premium", tags=["premium"])
 @app.get("/health")
 def healthcheck():
     return {"status": "ok"}
-

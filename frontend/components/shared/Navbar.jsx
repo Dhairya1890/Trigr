@@ -54,20 +54,26 @@ export default function Navbar() {
           <span>Trigr</span>
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex gap-8 items-center font-headline font-medium text-sm text-on-surface-variant">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "hover:text-primary transition-colors",
-                pathname === link.href && "text-primary font-bold"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "relative py-1 hover:text-primary transition-colors group",
+                  isActive && "text-primary"
+                )}
+              >
+                {link.label}
+                <span className={cn(
+                  "absolute bottom-0 left-0 w-full h-0.5 bg-primary transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100",
+                  isActive && "scale-x-100"
+                )} />
+              </Link>
+            );
+          })}
         </div>
 
         {/* Right side */}

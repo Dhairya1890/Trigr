@@ -1,0 +1,40 @@
+# Ruff configuration for Trigr backend
+# https://docs.astral.sh/ruff/
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+src = ["backend"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "T20", # flake8-print (warn on debug prints)
+]
+ignore = [
+    "T201",  # allow print() in seed.py and scripts
+    "B008",  # FastAPI Depends() is used intentionally in route signatures
+    "N815",  # API response models intentionally use camelCase fields for frontend contracts
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["backend"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# Black configuration (if used standalone)
+[tool.black]
+target-version = ["py313"]
+line-length = 120

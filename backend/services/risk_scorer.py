@@ -1,11 +1,4 @@
-CITY_RISK = {
-    "Mumbai": 35,
-    "Delhi": 30,
-    "Chennai": 28,
-    "Bangalore": 20,
-    "Kolkata": 25,
-    "Hyderabad": 22
-}
+CITY_RISK = {"Mumbai": 35, "Delhi": 30, "Chennai": 28, "Bangalore": 20, "Kolkata": 25, "Hyderabad": 22}
 
 
 def score_risk(city: str, zone: str, platform: str, month: int, shift_start: str | None = None) -> dict:
@@ -13,11 +6,11 @@ def score_risk(city: str, zone: str, platform: str, month: int, shift_start: str
 
     zone_lower = zone.lower()
     if "dharavi" in zone_lower or "kurla" in zone_lower or "sion" in zone_lower:
-      score += 20
+        score += 20
     elif "industrial" in zone_lower:
-      score += 15
+        score += 15
     else:
-      score += 5
+        score += 5
 
     platform_lower = platform.lower()
     if platform_lower in {"swiggy", "zomato"}:
@@ -46,4 +39,3 @@ def score_risk(city: str, zone: str, platform: str, month: int, shift_start: str
         tier = "HIGH"
 
     return {"risk_score": score, "risk_tier": tier}
-
