@@ -1,4 +1,4 @@
-import uuid
+import hashlib
 from datetime import UTC, datetime
 
 from fastapi import APIRouter
@@ -9,17 +9,13 @@ from backend.models.disruption import (
     PoolHealthResponse,
     SimulateTriggerRequest,
     SimulateTriggerResponse,
+    WeatherResponse,
 )
 from backend.services.fraud_detector import evaluate_fraud
 from backend.services.payout_engine import calculate_payout
 from backend.services.trigger_monitor import run_trigger_monitor
 
 router = APIRouter()
-
-# ---------------------------------------------------------------------------
-# Mock data definitions to support stable frontend/demo functionality
-# ---------------------------------------------------------------------------
-_MOCK_TIME = datetime.now(UTC)
 
 
 @router.get("/active", response_model=ActiveTriggersResponse)
@@ -28,38 +24,57 @@ def get_active_triggers():
     monitor_state = run_trigger_monitor()
     
     events = []
+    # Fixed base time for stable demo timestamps
+    base_time = "2026-04-14T10:30:00Z"
+    
     for ev in monitor_state.get("active_events", []):
+        event_id = f"evt_{hashlib.md5(ev['type'].encode() + ev['city'].encode()).hexdigest()[:6].upper()}"
         events.append(
             ActiveTriggerSummary(
-                id=f"evt_{uuid.uuid4().hex[:6].upper()}",
+                id=event_id,
                 type=ev["type"],
-                zone=ev.get("zone", "Dharavi"), # Default for demo
+                zone=ev.get("zone", "Dharavi"),
                 severity=ev["severity"],
-                timestamp=_MOCK_TIME.isoformat(),
+                timestamp=base_time,
             )
         )
     
-    # Fallback to a default if nothing detected in live integrations
+    # Fallback to a default stable event if nothing detected
     if not events:
         events.append(
             ActiveTriggerSummary(
-                id=f"evt_DEF_{uuid.uuid4().hex[:4].upper()}",
+                id="EVT_STABLE_001",
                 type="Heavy Rain",
                 zone="Dharavi",
                 severity="MEDIUM",
-                timestamp=_MOCK_TIME.isoformat(),
+                timestamp=base_time,
             )
         )
         
     return ActiveTriggersResponse(events=events)
 
 
+@router.get("/weather", response_model=WeatherResponse)
+def get_weather(city: str = "Mumbai"):
+    # Deterministic high-fidelity weather based on city name
+    h = int(hashlib.md5(city.encode()).hexdigest(), 16)
+    
+    return WeatherResponse(
+        city=city,
+        temp=f"{25 + (h % 10)}°C",
+        humidity=f"{70 + (h % 20)}%",
+        windSpeed=f"{10 + (h % 15)} km/h",
+        condition="Partly Cloudy" if h % 2 == 0 else "Overcast",
+        aqi=50 + (h % 100),
+        aqiLabel="Moderate" if (h % 100 < 50) else "Poor",
+        rainfall3h=f"{(h % 50) / 10}mm",
+        last_updated="10:30 AM",
+    )
+
+
 @router.post("/simulate", response_model=SimulateTriggerResponse)
 def simulate_trigger(payload: SimulateTriggerRequest):
-    # 1. Event creation (mocked by payload)
-
-    # 2. Affected worker/policy lookup (simulate a worker)
-    # Using fallback dummy policy parameters
+    # Deterministic simulation results
     mock_worker_baseline = {
         "shift_start": "10:00",
         "shift_end": "22:00",
@@ -70,44 +85,33 @@ def simulate_trigger(payload: SimulateTriggerRequest):
         "current_week_payouts_total": 0.0,
     }
 
-    # Simulate a disruption window of 5 hours
     disruption_params = {"disruption_start": "14:00", "disruption_end": "19:00"}
 
-    # 3. Fraud evaluation
-    # To keep the demo reliable, assume a CLEAN verdict for a simple simulation
-    fraud_result = evaluate_fraud(
-        {
-            "gps_matches_zone": True,
-            "app_active_before": True,
-            "worker_moving": True,
-            "account_age_days": 45,
-            "device_has_duplicate_accounts": False,
-            "recent_claims_count": 1,
-        }
-    )
+    fraud_result = evaluate_fraud({
+        "gps_matches_zone": True,
+        "app_active_before": True,
+        "worker_moving": True,
+        "account_age_days": 45,
+        "device_has_duplicate_accounts": False,
+        "recent_claims_count": 1,
+    })
 
-    # 4. Payout calculation
-    if fraud_result["verdict"] in ["CLEAN", "SOFT_FLAG"]:
-        payout_result = calculate_payout({**mock_worker_baseline, **disruption_params})
-        status_msg = (
-            f"Trigger simulated successfully. "
-            f"Generated payout of Rs {payout_result['payout']} ({fraud_result['verdict']})."
-        )
-    else:
-        payout_result = {}
-        status_msg = f"Trigger simulated successfully. Claim held/rejected ({fraud_result['verdict']})."
-
+    payout_result = calculate_payout({**mock_worker_baseline, **disruption_params})
+    
     return SimulateTriggerResponse(
         status="processed",
-        message=status_msg,
-        event={"payload": payload.model_dump(), "fraud_evaluation": fraud_result, "payout_calculation": payout_result},
+        message=f"Trigger simulated successfully. Generated payout of Rs {payout_result['payout']}.",
+        event={
+            "payload": payload.model_dump(),
+            "fraud_evaluation": fraud_result,
+            "payout_calculation": payout_result
+        },
     )
 
 
 @router.get("/insurer/pool-health", response_model=PoolHealthResponse)
 def get_pool_health():
-    # Simulate aggregated statistics for the insurer platform.
-    # We provide stable positive numbers to assure frontend dashboard rendering
+    # Stable aggregated metrics for insurer platform
     return PoolHealthResponse(
         premium_collected=8850000.0,
         payouts_issued=1120000.0,

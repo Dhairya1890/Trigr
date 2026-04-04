@@ -31,4 +31,5 @@ def calculate_weekly_premium(payload: dict) -> dict:
         "max_payout": max_payout,
         "coverage_pct": coverage_pct,
         "tier": tier,
+        "calculation_date": datetime.now().isoformat(),
     }

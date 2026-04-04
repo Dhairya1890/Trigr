@@ -1,58 +1,63 @@
-import uuid
+import hashlib
 from datetime import date, timedelta
 
 from fastapi import APIRouter
 
-from backend.models import Policy, PolicyLookupResponse, PurchasePolicyRequest, PurchasePolicyResponse
+from backend.models import (
+    Policy,
+    PolicyLookupResponse,
+    PurchasePolicyRequest,
+    PurchasePolicyResponse,
+)
 
 router = APIRouter()
 
 
-@router.post("/purchase", response_model=PurchasePolicyResponse)
-def purchase_policy(payload: PurchasePolicyRequest):
-    # This is scaffolding. We don't have DB persistence yet, but we mock the dates
-    # and provide a stable response so the frontend flow completes.
-
+def _get_deterministic_policy(worker_id: str) -> Policy:
+    # Use worker_id as seed for deterministic policy data
+    h = int(hashlib.md5(worker_id.encode()).hexdigest(), 16)
+    
     today = date.today()
     week_start = today - timedelta(days=today.weekday())
     week_end = week_start + timedelta(days=6)
-
-    # Calculate mock premium/coverage directly if needed, or assume stable fallback defaults
-    policy_id = f"pol_gen_{uuid.uuid4().hex[:8]}"
-
-    return PurchasePolicyResponse(
-        policy_id=policy_id,
-        week_start=week_start.isoformat(),
-        week_end=week_end.isoformat(),
-        premium_paid=131.0,  # Faked fallback
+    
+    policy_id = f"pol_{hashlib.md5(worker_id.encode()).hexdigest()[:8].upper()}"
+    
+    return Policy(
+        id=policy_id,
+        worker_id=worker_id,
+        week_start=week_start,
+        week_end=week_end,
+        premium_paid=131.0 + (h % 50),
         max_payout=3500.0,
         coverage_pct=0.75,
-        verification_tier=1,
+        verification_tier=1 + (h % 2),
         status="ACTIVE",
+    )
+
+
+@router.post("/purchase", response_model=PurchasePolicyResponse)
+def purchase_policy(payload: PurchasePolicyRequest):
+    policy = _get_deterministic_policy(payload.worker_id)
+
+    return PurchasePolicyResponse(
+        policy_id=policy.id,
+        week_start=policy.week_start.isoformat(),
+        week_end=policy.week_end.isoformat(),
+        premium_paid=policy.premium_paid,
+        max_payout=policy.max_payout,
+        coverage_pct=policy.coverage_pct,
+        verification_tier=policy.verification_tier,
+        status=policy.status,
     )
 
 
 @router.get("/{worker_id}", response_model=PolicyLookupResponse)
 def get_policy(worker_id: str):
-    # Scaffolding: Mock a valid current policy to let frontend display dashboard.
-    today = date.today()
-    week_start = today - timedelta(days=today.weekday())
-    week_end = week_start + timedelta(days=6)
-
-    active_policy = Policy(
-        id=f"pol_gen_{uuid.uuid4().hex[:8]}",
-        worker_id=worker_id,
-        week_start=week_start,
-        week_end=week_end,
-        premium_paid=131.0,
-        max_payout=3500.0,
-        coverage_pct=0.75,
-        verification_tier=1,
-        status="ACTIVE",
-    )
+    policy = _get_deterministic_policy(worker_id)
 
     return PolicyLookupResponse(
         worker_id=worker_id,
-        policy=active_policy,
-        history=[active_policy],  # One record for history mock too
+        policy=policy,
+        history=[policy],  # Deterministic history (single entry for now)
     )

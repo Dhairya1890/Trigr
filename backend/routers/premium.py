@@ -8,7 +8,9 @@ router = APIRouter()
 
 @router.post("/calculate", response_model=PremiumCalculationResponse)
 def calculate_premium(payload: PremiumCalculationRequest):
-    quote = calculate_weekly_premium(payload.model_dump())
+    from datetime import datetime
+    # We use current month to provide seasonally-aware quotes
+    quote = calculate_weekly_premium(payload.model_dump() | {"month": datetime.now().month})
 
     return PremiumCalculationResponse(
         weekly_premium=quote["weekly_premium"],

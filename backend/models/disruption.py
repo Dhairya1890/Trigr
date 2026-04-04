@@ -74,3 +74,17 @@ class PoolHealthResponse(BaseModel):
     reserve_buffer: float
     active_workers: int = 0
     solvent: bool = True
+
+
+class WeatherResponse(BaseModel):
+    """Response returned by GET /api/triggers/weather."""
+
+    city: str
+    temp: str
+    humidity: str
+    windSpeed: str
+    condition: str
+    aqi: int
+    aqiLabel: str
+    rainfall3h: str
+    last_updated: str

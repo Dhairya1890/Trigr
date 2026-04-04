@@ -16,6 +16,7 @@ from backend.models.disruption import (
     PoolHealthResponse,
     SimulateTriggerRequest,
     SimulateTriggerResponse,
+    WeatherResponse,
 )
 from backend.models.payout import Payout, PayoutLedgerItem, PayoutLedgerResponse
 from backend.models.policy import (
@@ -62,6 +63,7 @@ __all__ = [
     "ActiveTriggerSummary",
     "ActiveTriggersResponse",
     "PoolHealthResponse",
+    "WeatherResponse",
     # Payout
     "Payout",
     "PayoutLedgerItem",
