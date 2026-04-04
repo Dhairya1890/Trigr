@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { StatusBadge } from "@/components/ui/badge";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Section, SectionHeader, PageShell } from "@/components/ui/section";
 import {
@@ -21,6 +22,10 @@ import {
   Building2,
   BarChart4,
   ShoppingBasket,
+  Globe,
+  Users,
+  CheckCircle2,
+  BarChart3,
   ChevronDown,
 } from "lucide-react";
 
@@ -35,7 +40,7 @@ const personas = [
         Pay as little as{" "}
         <span className="font-bold text-primary">₹131/week</span>. When your
         zone is hit by rain, smog, or a curfew, your payout reaches your UPI
-        automatically — before you even open the app.
+        automatically - before you even open the app.
       </>
     ),
     cta: "See how coverage works",
@@ -136,7 +141,7 @@ const techChips = [
 /* ── Case studies ── */
 const caseStudies = [
   {
-    name: "Ravi · Mumbai",
+    name: "Ravi - Mumbai",
     role: "Food Delivery",
     roleIcon: Bike,
     topColor: "bg-tertiary-container",
@@ -150,7 +155,7 @@ const caseStudies = [
       '"Water was knee-deep in Dadar. I didn\'t even have to call anyone. Trigr notified me and the money was there by 9 PM."',
   },
   {
-    name: "Priya · Delhi NCR",
+    name: "Priya - Delhi NCR",
     role: "Grocery Delivery",
     roleIcon: ShoppingBasket,
     topColor: "bg-primary-container",
@@ -234,8 +239,8 @@ export default function LandingPage() {
           </div>
 
           {/* Persona Tabs */}
-          <div className="mt-16 bg-surface-container-lowest rounded-xl shadow-feature border border-outline-variant/10 overflow-hidden max-w-3xl mx-auto">
-            <div className="flex border-b border-outline-variant/20">
+          <div className="mt-16 bg-surface-container-lowest rounded-2xl shadow-feature border border-outline-variant/10 overflow-hidden max-w-3xl mx-auto animate-fade-up">
+            <div className="flex border-b border-outline-variant/20 bg-surface-container-low/30">
               {personas.map((p) => {
                 const Icon = p.icon;
                 const isActive = activeTab === p.id;
@@ -243,9 +248,9 @@ export default function LandingPage() {
                   <button
                     key={p.id}
                     onClick={() => setActiveTab(p.id)}
-                    className={`flex-1 py-4 px-2 font-headline font-bold text-sm md:text-base border-b-2 transition-all flex items-center justify-center gap-2 ${
+                    className={`flex-1 py-5 px-2 font-headline font-bold text-sm md:text-base border-b-2 transition-all flex items-center justify-center gap-2 ${
                       isActive
-                        ? "border-primary-container text-primary-container bg-primary-container/5"
+                        ? "border-primary text-primary bg-primary/5"
                         : "border-transparent text-on-surface-variant hover:bg-surface-container-low"
                     }`}
                   >
@@ -255,21 +260,21 @@ export default function LandingPage() {
                 );
               })}
             </div>
-            <div className="p-8 text-left min-h-[180px] flex flex-col justify-between border-l-4 border-tertiary-container">
+            <div className="p-8 md:p-10 text-left min-h-[200px] flex flex-col justify-between border-l-4 border-primary">
               {personas.map((p) => (
                 <div
                   key={p.id}
-                  className={`space-y-4 ${activeTab === p.id ? "block" : "hidden"}`}
+                  className={`space-y-5 animate-in fade-in slide-in-from-left-2 duration-500 ${activeTab === p.id ? "block" : "hidden"}`}
                 >
-                  <p className="text-on-surface text-lg leading-relaxed">
+                  <p className="text-on-surface text-lg md:text-xl leading-relaxed">
                     {p.text}
                   </p>
                   <Link
                     href="/register"
-                    className="inline-flex items-center text-primary-container font-bold hover:gap-2 transition-all"
+                    className="inline-flex items-center text-primary font-bold hover:gap-2 transition-all group"
                   >
                     {p.cta}{" "}
-                    <ArrowRight className="w-4 h-4 ml-1" />
+                    <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
               ))}
@@ -277,11 +282,11 @@ export default function LandingPage() {
           </div>
 
           {/* Hero CTAs */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild>
+          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-fade-up [animation-delay:200ms]">
+            <Button size="xl" className="shadow-cta" asChild>
               <Link href="/register">Request a Demo</Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="outline" size="xl" asChild>
               <Link href="#how-it-works">Explore the Docs</Link>
             </Button>
           </div>
@@ -289,7 +294,7 @@ export default function LandingPage() {
 
         {/* ── Stats Strip ── */}
         <Section alt id="how-it-works">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 bg-surface-container-lowest p-8 rounded-xl shadow-elevated -mt-32 relative z-10 border border-outline-variant/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 bg-surface-container-lowest p-8 md:p-12 rounded-3xl shadow-elevated -mt-36 relative z-10 border border-outline-variant/10">
             <MetricCard value="12M+" label="Workers Unprotected" />
             <MetricCard value="₹1.8k-2.4k" label="Monthly Income Lost" />
             <MetricCard value="₹131" label="Weekly Premium" />
@@ -297,29 +302,31 @@ export default function LandingPage() {
           </div>
 
           {/* Features heading */}
-          <div className="mt-24 text-center space-y-6">
-            <h2 className="text-3xl md:text-4xl font-headline font-extrabold text-on-surface">
-              Parametric insurance built for Bharat&apos;s gig economy.
+          <div className="mt-32 text-center space-y-6">
+            <h2 className="text-3xl md:text-5xl font-headline font-extrabold text-on-surface leading-tight">
+              Parametric insurance built <br className="hidden md:block" /> for Bharat&apos;s gig economy.
             </h2>
-            <p className="text-lg text-on-surface-variant">
+            <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto">
               No broker. No claim form. Just a trigger and a transfer.
             </p>
           </div>
 
           {/* Feature Cards */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((f) => {
               const Icon = f.icon;
               return (
                 <div
                   key={f.title}
-                  className="bg-surface-container-lowest p-8 rounded-xl shadow-sm border-t-4 border-transparent hover:border-primary-container transition-all group"
+                  className="bg-surface-container-lowest p-10 rounded-3xl shadow-card border border-outline-variant/5 hover:border-primary/20 hover:shadow-elevated transition-all group"
                 >
-                  <Icon className="w-10 h-10 text-primary-container mb-4" />
-                  <h3 className="text-xl font-headline font-bold text-on-surface mb-2">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
+                    <Icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-headline font-bold text-on-surface mb-3">
                     {f.title}
                   </h3>
-                  <p className="text-on-surface-variant">{f.desc}</p>
+                  <p className="text-on-surface-variant leading-relaxed">{f.desc}</p>
                 </div>
               );
             })}
@@ -327,14 +334,15 @@ export default function LandingPage() {
         </Section>
 
         {/* ── Marquee ── */}
-        <section className="py-24 overflow-hidden bg-surface">
-          <div className="space-y-12">
+        <section className="py-32 overflow-hidden bg-surface relative">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-outline-variant/20 to-transparent" />
+          <div className="space-y-16">
             {/* Forward */}
             <div className="flex animate-marquee gap-8 whitespace-nowrap">
-              {[...marqueeTop, ...marqueeTop].map((item, i) => (
+              {[...marqueeTop, ...marqueeTop, ...marqueeTop].map((item, i) => (
                 <span
                   key={`top-${i}`}
-                  className="px-8 py-3 rounded-full border border-primary-container font-bold bg-primary-container/10 text-on-surface shrink-0"
+                  className="px-10 py-4 rounded-full border border-primary/20 font-bold bg-primary/5 text-primary text-sm uppercase tracking-widest shrink-0"
                 >
                   {item}
                 </span>
@@ -342,61 +350,67 @@ export default function LandingPage() {
             </div>
             {/* Reverse */}
             <div className="flex animate-marquee-reverse gap-8 whitespace-nowrap">
-              {[...marqueeBottom, ...marqueeBottom].map((item, i) => (
+              {[...marqueeBottom, ...marqueeBottom, ...marqueeBottom].map((item, i) => (
                 <span
                   key={`bot-${i}`}
-                  className="px-8 py-3 rounded-full border border-outline-variant text-on-surface-variant font-medium shrink-0"
+                  className="px-10 py-4 rounded-full border border-outline-variant/30 text-on-surface-variant font-bold text-sm uppercase tracking-widest shrink-0 bg-surface-container-low"
                 >
                   {item}
                 </span>
               ))}
             </div>
             {/* Quote block */}
-            <div className="max-w-2xl mx-auto px-6">
-              <div className="bg-primary/5 border-l-4 border-primary-container p-6 rounded-r-xl">
-                <p className="text-on-surface font-medium text-lg italic">
+            <div className="max-w-3xl mx-auto px-6">
+              <div className="bg-primary-container/5 border-l-4 border-primary p-8 rounded-r-3xl">
+                <p className="text-on-surface font-headline font-bold text-xl md:text-2xl italic leading-relaxed">
                   &ldquo;Trigr covers what platforms won&apos;t - and pays before
                   you even think to ask.&rdquo;
                 </p>
               </div>
             </div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-outline-variant/20 to-transparent" />
         </section>
 
         {/* ── 4-Step Flow ── */}
         <Section alt>
-          <h2 className="text-3xl font-headline font-bold mb-16 text-center">
-            Simple. Transparent. 4 Steps.
-          </h2>
-          <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-4 max-w-4xl mx-auto">
+          <div className="text-center mb-20 space-y-4">
+            <h2 className="text-3xl md:text-4xl font-headline font-extrabold text-on-surface">
+              Simple. Transparent. 4 Steps.
+            </h2>
+            <p className="text-on-surface-variant max-w-xl mx-auto">From registration to payout in a fraction of the time of traditional insurance.</p>
+          </div>
+          <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-4 max-w-5xl mx-auto">
             {/* Connector */}
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 border-t-2 border-dashed border-primary-container/30 -translate-y-8 z-0" />
+            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 border-t-2 border-dashed border-primary/20 -translate-y-8 z-0" />
             {steps.map((s, i) => {
               const Icon = s.icon;
               return (
                 <div
                   key={i}
-                  className="relative z-10 flex flex-col items-center gap-4 flex-1"
+                  className="relative z-10 flex flex-col items-center gap-6 flex-1 group"
                 >
-                  <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-xl shadow-lg ring-4 ring-white dark:ring-surface">
+                  <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white font-headline font-black text-2xl shadow-cta ring-8 ring-white dark:ring-surface transition-transform group-hover:scale-110">
                     {i + 1}
                   </div>
-                  <div className="space-y-1 text-center">
-                    <Icon className="w-5 h-5 text-primary-container mx-auto" />
-                    <h4 className="font-bold">{s.title}</h4>
-                    <p className="text-xs text-on-surface-variant">{s.sub}</p>
+                  <div className="space-y-2 text-center">
+                    <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto group-hover:bg-primary/10 transition-colors">
+                      <Icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <h4 className="font-headline font-bold text-lg">{s.title}</h4>
+                    <p className="text-sm text-on-surface-variant font-medium leading-tight">{s.sub}</p>
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-20 space-y-4 text-center">
-            <Button size="xl" asChild>
+          <div className="mt-24 space-y-6 text-center animate-fade-up">
+            <Button size="xl" className="px-12 shadow-cta" asChild>
               <Link href="/register">
-                Start Coverage <ArrowRight className="w-5 h-5" />
+                Start Coverage <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
-            <p className="text-sm text-on-surface-variant">
+            <p className="text-sm text-on-surface-variant font-medium">
               No app download. Works on any mobile browser.
             </p>
           </div>
@@ -404,39 +418,41 @@ export default function LandingPage() {
 
         {/* ── Case Studies ── */}
         <Section id="workers">
-          <SectionHeader title="Real disruptions. Real payouts. Real workers." />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <SectionHeader 
+            title="Real disruptions. Real payouts. Real workers." 
+            subtitle="How Trigr helps independent contractors maintain income resilience during city-wide events."
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-16">
             {caseStudies.map((cs) => {
               const RoleIcon = cs.roleIcon;
               return (
                 <Card
                   key={cs.name}
-                  className="overflow-hidden shadow-feature flex flex-col h-full"
+                  hover
+                  className="overflow-hidden shadow-elevated flex flex-col h-full border-none bg-surface-container-low/50"
                 >
-                  <div className={`h-2 ${cs.topColor}`} />
-                  <div className="p-8 space-y-6 flex-grow">
+                  <div className={`h-2.5 ${cs.topColor} w-full`} />
+                  <div className="p-8 md:p-10 space-y-8 flex-grow">
                     {/* Header */}
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-lg font-bold text-on-surface-variant">
+                      <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-xl font-headline font-black text-primary shadow-inner">
                           {cs.initials}
                         </div>
                         <div>
-                          <h3 className="font-headline font-bold text-xl">
+                          <h3 className="font-headline font-extrabold text-2xl text-on-surface">
                             {cs.name}
                           </h3>
-                          <p className="text-sm text-on-surface-variant flex items-center gap-1">
-                            {cs.role}{" "}
-                            <RoleIcon className="w-4 h-4" />
+                          <p className="text-sm font-bold text-on-surface-variant flex items-center gap-2 mt-0.5">
+                            <RoleIcon className="w-4 h-4 text-primary" />
+                            {cs.role}
                           </p>
                         </div>
                       </div>
-                      <span className="bg-primary/10 text-primary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                        <CircleCheckBig className="w-3 h-3" /> Sent to UPI
-                      </span>
+                      <StatusBadge status="PAID" className="px-4 py-1.5 rounded-xl shadow-sm" />
                     </div>
                     {/* Details */}
-                    <div className="space-y-3">
+                    <div className="space-y-4 bg-surface-container-lowest/50 p-6 rounded-2xl border border-outline-variant/10">
                       {[
                         { label: "Event", value: cs.event },
                         { label: "Trigger Threshold", value: cs.threshold },
@@ -444,22 +460,25 @@ export default function LandingPage() {
                       ].map((row) => (
                         <div
                           key={row.label}
-                          className="flex justify-between text-sm py-2 border-b border-outline-variant/10"
+                          className="flex justify-between text-sm py-2.5 border-b border-outline-variant/5 last:border-0"
                         >
-                          <span className="text-outline">{row.label}</span>
-                          <span className="font-semibold">{row.value}</span>
+                          <span className="text-outline font-bold uppercase tracking-wider text-[10px]">{row.label}</span>
+                          <span className="font-bold text-on-surface">{row.value}</span>
                         </div>
                       ))}
-                      <div className="flex justify-between text-sm py-2 font-bold text-on-surface">
-                        <span>Payout Amount</span>
-                        <span className="text-primary font-currency">
+                      <div className="flex justify-between text-base py-3 mt-2 border-t-2 border-primary/10 font-black text-on-surface">
+                        <span className="uppercase tracking-widest text-xs self-center">Payout Amount</span>
+                        <span className="text-primary text-2xl font-currency">
                           {cs.payout}
                         </span>
                       </div>
                     </div>
-                    <p className="text-sm italic text-on-surface-variant">
-                      {cs.quote}
-                    </p>
+                    <div className="relative">
+                      <div className="absolute -left-2 -top-2 text-4xl text-primary/10 font-serif">&ldquo;</div>
+                      <p className="text-base italic text-on-surface-variant leading-relaxed pl-4 font-medium">
+                        {cs.quote}
+                      </p>
+                    </div>
                   </div>
                 </Card>
               );
@@ -469,20 +488,20 @@ export default function LandingPage() {
 
         {/* ── Tech Stack + CTA ── */}
         <Section alt id="platforms">
-          <div className="space-y-16">
+          <div className="space-y-20">
             <SectionHeader
               title="The engine behind Trigr"
               subtitle="Built by insurance veterans and infrastructure engineers for ultimate reliability."
             />
-            <div className="pt-4 border-t border-outline-variant/20">
-              <p className="text-center text-xs font-bold text-outline uppercase tracking-widest mb-8">
-                Our Technology Stack
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
+            <div className="pt-10 border-t border-outline-variant/20 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 bg-surface-container-low text-[10px] font-black text-outline uppercase tracking-[0.2em]">
+                Enterprise Stack
+              </div>
+              <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
                 {techChips.map((chip) => (
                   <span
                     key={chip}
-                    className="px-4 py-2 bg-surface-container-lowest rounded-lg border border-outline-variant/30 text-sm font-medium"
+                    className="px-6 py-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 text-sm font-bold text-on-surface shadow-sm hover:shadow-card hover:border-primary/20 transition-all cursor-default"
                   >
                     {chip}
                   </span>
@@ -490,16 +509,19 @@ export default function LandingPage() {
               </div>
             </div>
             {/* CTA Block */}
-            <div className="bg-primary-container text-white p-12 rounded-2xl shadow-2xl text-center group cursor-pointer hover:scale-[1.01] transition-all">
-              <h2 className="text-3xl md:text-4xl font-headline font-extrabold">
-                Want to see Trigr in action?
+            <div className="bg-primary hover:bg-on-primary-fixed-variant text-white p-12 md:p-20 rounded-3xl shadow-cta text-center group cursor-pointer transition-all relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-container/20 rounded-full -ml-32 -mb-32 blur-3xl" />
+              
+              <h2 className="text-3xl md:text-5xl font-headline font-black relative z-10 leading-tight">
+                Want to see India&apos;s <br /> first parametric insurer in action?
               </h2>
               <Link
                 href="/register"
-                className="text-xl mt-4 font-bold opacity-90 group-hover:opacity-100 flex items-center justify-center gap-2"
+                className="inline-flex items-center text-xl md:text-2xl mt-10 font-black relative z-10 group-hover:scale-110 transition-transform"
               >
                 Request a Demo{" "}
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
+                <ArrowRight className="w-8 h-8 ml-3 transition-transform group-hover:translate-x-3" />
               </Link>
             </div>
           </div>

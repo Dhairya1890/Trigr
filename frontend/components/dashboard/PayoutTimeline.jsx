@@ -12,8 +12,8 @@ export default function PayoutTimeline({ claims }) {
   const data = claims || mockTimeline;
 
   return (
-    <Card>
-      <CardContent className="p-6 space-y-4">
+    <Card hover className="border-none shadow-elevated bg-surface-container-low/50">
+      <CardContent className="p-6 md:p-8 space-y-6">
         <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-primary-container" />
           <h3 className="font-headline font-bold text-sm">Recent Payouts</h3>
@@ -27,7 +27,7 @@ export default function PayoutTimeline({ claims }) {
               <div key={c.id} className="flex items-center justify-between py-2 border-b border-outline-variant/10 last:border-0">
                 <div className="space-y-0.5">
                   <p className="text-sm font-medium">{c.event}</p>
-                  <p className="text-xs text-outline">{c.date} · {c.zone}</p>
+                  <p className="text-xs font-bold text-outline uppercase tracking-wider">{c.date} - {c.zone}</p>
                 </div>
                 <div className="text-right flex items-center gap-3">
                   <span className="font-headline font-bold text-sm font-currency">₹{c.amount}</span>

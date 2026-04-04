@@ -3,22 +3,35 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CircleCheckBig, Send, SkipForward } from "lucide-react";
+import { Loader2, CircleCheckBig, Send, SkipForward, XCircle } from "lucide-react";
+import { api } from "@/lib/api";
 
 export default function UPIVerifyCard({ upi, onVerified, onSkip }) {
   const [state, setState] = useState("idle"); // idle | sending | success | error
 
   async function handleVerify() {
     setState("sending");
-    // Simulate penny drop delay
-    await new Promise((r) => setTimeout(r, 2500));
-    setState("success");
-    setTimeout(() => onVerified(), 1500);
+    try {
+      // Call the API (fallback already defined in lib/api.js if down)
+      const res = await api.verifyUPI(upi, "me");
+      
+      // Simulate penny drop delay for premium UI feel
+      await new Promise((r) => setTimeout(r, 1500));
+      
+      if (res?.verified) {
+        setState("success");
+        setTimeout(() => onVerified(), 1500);
+      } else {
+        setState("error");
+      }
+    } catch (err) {
+      setState("error");
+    }
   }
 
   return (
-    <Card className="overflow-hidden">
-      <div className="h-2 bg-tertiary-container" />
+    <Card hover className="overflow-hidden border-none shadow-elevated bg-surface-container-low/50">
+      <div className="h-2 bg-primary-container" />
       <CardContent className="p-8 space-y-6 text-center">
         {state === "idle" && (
           <>
@@ -55,7 +68,7 @@ export default function UPIVerifyCard({ upi, onVerified, onSkip }) {
             <div className="space-y-2">
               <h3 className="text-xl font-headline font-bold">Processing Transfer</h3>
               <p className="text-sm text-on-surface-variant">
-                Sending ₹1 via Razorpay to {upi}…
+                Sending ₹1 via Razorpay to {upi}...
               </p>
             </div>
           </>

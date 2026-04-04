@@ -14,43 +14,44 @@ export default function PolicyCard({ policy }) {
   };
 
   return (
-    <Card className="overflow-hidden">
-      <div className="h-1.5 bg-primary-container" />
-      <CardContent className="p-6 space-y-4">
+    <Card hover className="border-none shadow-elevated bg-surface-container-low/50">
+      <CardContent className="p-6 md:p-8 space-y-6">
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-primary-container" />
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
+              <ShieldCheck className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-headline font-bold text-sm">Active Policy</h3>
-              <StatusBadge status={data.status} />
+              <h3 className="font-headline font-black text-base text-on-surface">Active Policy</h3>
+              <StatusBadge status={data.status} className="mt-1" />
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-headline font-extrabold text-primary-container font-currency">
+            <p className="text-3xl font-headline font-black text-primary font-currency leading-none">
               ₹{data.premiumPaid}
             </p>
-            <p className="text-xs text-outline">paid this week</p>
+            <p className="text-[10px] uppercase tracking-widest font-black text-outline mt-1.5">Weekly Premium</p>
           </div>
         </div>
 
-        <div className="space-y-2 pt-2 border-t border-outline-variant/10">
-          <div className="flex justify-between text-sm">
-            <span className="text-outline flex items-center gap-1"><Calendar className="w-3 h-3" /> Coverage Period</span>
-            <span className="font-medium">{data.weekStart} – {data.weekEnd}</span>
+        <div className="grid grid-cols-2 gap-4 pt-6 border-t border-outline-variant/10">
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline flex items-center gap-1.5">
+              <Calendar className="w-3 h-3" /> Coverage
+            </span>
+            <p className="text-sm font-bold text-on-surface">{data.weekStart} - {data.weekEnd}</p>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-outline">Max Payout</span>
-            <span className="font-medium font-currency">₹{data.maxPayout?.toLocaleString("en-IN")}</span>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline">Max Payout</span>
+            <p className="text-sm font-bold text-on-surface font-currency">₹{data.maxPayout?.toLocaleString("en-IN")}</p>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-outline">Coverage</span>
-            <span className="font-medium">{data.coveragePct}%</span>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline">Tier</span>
+            <p className="text-sm font-bold text-on-surface">Verification {data.verificationTier}</p>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-outline">Verification</span>
-            <span className="font-medium">Tier {data.verificationTier}</span>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase tracking-widest font-black text-outline">Protection</span>
+            <p className="text-sm font-bold text-on-surface">{data.coveragePct}% Income</p>
           </div>
         </div>
       </CardContent>

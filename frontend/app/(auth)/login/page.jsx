@@ -139,6 +139,9 @@ export default function LoginPage() {
                 <ShieldCheck className="w-3 h-3" />
                 <span>Demo Environment Enabled</span>
               </div>
+              <p className="text-[10px] text-on-surface-variant/70 text-center leading-relaxed">
+                Authentication is simulated frontend-only for demo purposes. Do not enter real credentials.
+              </p>
             </div>
           </div>
         </div>

@@ -1,105 +1,71 @@
-# Trigr Frontend — Parametric Income Protection
+# Frontend Implementation Guide
 
-This directory contains the **Next.js 14** frontend for the Trigr platform, a state-of-the-art parametric insurance solution tailored for India's gig worker ecosystem.
+This document covers the implementation details for the Trigr frontend (Next.js 14 App Router).
 
-## 🚀 Quick Start
+## 📁 Architecture & Route Structure
 
-### 1. Prerequisite: Backend
-
-Ensure the FastAPI backend is running first.
-
-```bash
-# In the project root
-npm run backend:dev
-```
-
-### 2. Frontend Setup
-
-```bash
-# In the frontend directory
-npm install
-npm run dev
+```text
+frontend/
+├── app/                  # Next.js App Router
+│   ├── (auth)/           # Authentication & Onboarding (Login, Register, Quote)
+│   ├── admin/            # Admin Dashboards (Fraud Queue, Analytics, Settings)
+│   ├── insurer/          # Insurer Dashboards (Live Monitoring, Pool Health, Payouts)
+│   ├── worker/           # Worker Application (Dashboard, Active Policy, Claims History)
+│   └── layout.jsx        # Root Layout with AuthProvider & ThemeProvider
+├── components/           # Reusable React Components
+│   ├── ui/               # Base primitives (Buttons, Cards, Badges)
+│   ├── shared/           # Cross-cutting UI (Navbar, RoleGuard, Footer, SimulatorButton)
+│   ├── onboarding/       # Registration forms natively triggering API validation
+│   └── ...               # Domain-specific modules (Admin, Insurer, Worker logic)
+├── context/              # Global React Context (AuthContext.jsx)
+├── lib/                  # Shared utilities and core API fetcher (`api.js`)
+└── hooks/                # Data extraction & polling hooks (`useWorker`, `useDisruptions`, `useWeather`)
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🔐 Authentication & Security
+## 🔐 Auth & RoleGuard Behavior
 
-The platform implements a centralized **Authentication & Authorization** system to ensure secure, role-based access.
+We use a local, cookie-simulated context via `AuthContext.jsx`. In production, this will natively connect to Supabase Auth.
 
-### Centralized Auth Flow
+- **Provider**: Standardizes `user`, `role`, and `isAuthenticated` states application-wide.
+- **RoleGuard.jsx**: Client-side interception layout wrapper.
+  - Generates immediate client-side redirects if an unauthorized agent tries accessing protected scopes.
+  - Automatically sends `/worker/*` visitors to login if they are missing standard bearer tokens.
 
-- **AuthContext**: Managed via `frontend/context/AuthContext.jsx`. It handles session initialization, persistence across refreshes, and role-based redirection.
-- **AuthProvider**: Wraps the entire application in `layout.jsx`, providing a unified state for `user`, `role`, and `isAuthenticated`.
-- **useAuth Hook**: Any client component can easily access the current user and authentication methods:
+## 🔌 API Client & Data Hooks (`lib/api.js`)
 
-```javascript
-const { user, login, logout, isAuthenticated } = useAuth();
+All standard network logic pushes through `frontend/lib/api.js`. This allows the application to remain decoupled from underlying backend refactorings.
+
+### Fallback Behavior (`IS_DEMO_MODE`)
+
+- **Fetch-First Strategy**: The frontend strictly executes `fetch()` towards the active FastAPI backend first.
+- **Defensive Fallbacks**: If the backend is unreachable (e.g. `Connection Refused`) or an endpoint explicitly throws a `404`, `api.js` gracefully intercepts the `null` response and cascades to a static JSON payload natively fulfilling the UI's typing requirements. This guarantees presentation stability.
+
+### Primary Hooks
+
+1. **`useWorker`**: Fetches active worker profile (`/api/workers/{id}`), active policies (`/api/policies/{id}`), and historical claims (`/api/claims/{id}`).
+2. **`useDisruptions`**: Connects to the event engine (`/api/triggers/active`) to hydrate incident timelines.
+3. **`useWeather`**: Binds to weather monitoring models directly feeding `WeatherWidget`.
+
+## 🛠 Commands
+
+Ensure the root `package.json` workspace structure is respected when issuing commands:
+
+```bash
+# Build the production bundle
+npm run build --workspace frontend
+
+# Start the dev server
+npm run dev --workspace frontend
+
+# Lint codebase (ensures strict compliance)
+npm run lint --workspace frontend
 ```
 
-### Role-Based Access Control (RBAC)
+## ⚠️ Current Limitations
 
-We use a robust `RoleGuard.jsx` component to protect sensitive dashboard routes:
-
-- **Worker Dashboard** (`/worker`): Requires `role === "worker"`
-- **Insurer Dashboard** (`/insurer`): Requires `role === "insurer"`
-- **Admin Dashboard** (`/admin`): Requires `role === "admin"`
-
-Unauthorized access attempts are automatically intercepted and redirected to either the login page or the user's appropriate dashboard.
-
----
-
-## 🛠 Features & Architecture
-
-### Key Features
-
-- **Parametric Trigger Monitoring**: Real-time visualization of rainfall, AQI, and noise disruptions.
-- **Automated Payouts**: Logic for immediate UPI-based disbursement when thresholds are met.
-- **AI Fraud Shield**: Anomaly detection signals to prevent "ghost" worker activity.
-- **Interactive Simulator**: Test trigger events and payout cycles in a sandbox environment.
-
-### Project Structure
-
-```text
-frontend/
-├── app/                  # Next.js App Router (File-based Routing)
-│   ├── (auth)/           # Auth Routes (Login, Register, Quote)
-│   ├── admin/            # Admin Dashboards & Analytics
-│   ├── insurer/          # Insurer Dashboards & Risk Monitoring
-│   ├── worker/           # Worker Dashboards & Policy Management
-│   └── layout.jsx        # Root Layout with AuthProvider & ThemeProvider
-├── components/           # React Components
-│   ├── ui/               # Standardized Fintech Primitives (Badges, MetricCards)
-│   ├── shared/           # Cross-cutting UI (Navbar, RoleGuard, Footer)
-│   └── ...               # Domain-specific components (Admin, Insurer, Worker)
-├── context/              # Global State (AuthContext.jsx)
-├── lib/                  # Utilities & API client (api.js)
-└── hooks/                # Custom React hooks (useWorker, useAuth)
-```
-
----
-
-## 🎨 Design System
-
-Built with a **Premium Fintech Aesthetic** using Tailwind CSS and HSL-mapped variables.
-
-- **Dual-Theme Stability**: Full support for Dark and Light modes with high-contrast stabilization for critical data surfaces.
-- **Resonant Typography**: Uses **Plus Jakarta Sans** for professional, modern headlines.
-- **Extension Resilience**: Includes built-in suppression for external browser extension errors (e.g., MetaMask, MetaMask inpage.js) that can interfere with the development overlay.
-
----
-
-## 🏗 Development Commands
-
-| Command | Description |
-| :--- | :--- |
-| `npm run dev` | Starts the development server with Hot Module Replacement. |
-| `npm run build` | Compiles the production-optimized application. |
-| `npm run lint` | Runs ESLint to ensure code quality and consistency. |
-| `npm run start` | Runs the built production server locally. |
-
----
-
-> **Note on Demo Mode**: The application currently operates in "Demo Mode" with a unified API client that handles backend communication while providing intelligent fallbacks if the server is unreachable. Production deployments will require live Supabase and Razorpay API keys.
+- **Fake Authentication**: The current authentication layer uses `localStorage` for rapid prototyping. It is entirely insecure for production.
+- **Demo Fallbacks**: Because the database integration is actively decoupled, some routes will deliberately return static default payloads (like `IS_DEMO_MODE=true` failsafes) if the FastAPI Python router is offline. Ensure `npm run backend:dev` is running first to consume dynamic contracts.

@@ -8,44 +8,81 @@ import WeatherWidget from "@/components/dashboard/WeatherWidget";
 import PremiumBadge from "@/components/dashboard/PremiumBadge";
 import PayoutTimeline from "@/components/dashboard/PayoutTimeline";
 import SimulatorButton from "@/components/shared/SimulatorButton";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import useWorker from "@/hooks/useWorker";
+import useDisruptions from "@/hooks/useDisruptions";
+import useWeather from "@/hooks/useWeather";
+import { StatusBadge } from "@/components/ui/badge";
 
 export default function WorkerDashboardPage() {
-  const activeEvent = {
-    type: "Heavy Rain",
-    city: "Mumbai",
-    zones: ["Dharavi", "Kurla", "Sion"],
-    since: "2:00 PM",
-  };
+  const { worker, policy, claims, loading } = useWorker();
+  const { activeEvents } = useDisruptions(worker?.city || "Mumbai");
+  const { weather } = useWeather(worker?.city || "Mumbai");
+
+  const activeEvent = activeEvents?.[0] || null;
+
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary-container" />
+        <p className="text-sm text-outline animate-pulse">Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  const premiumData = policy ? {
+    weeklyPremium: policy.premium_paid,
+    riskTier: "MEDIUM", // Standardized to mock structure fallback
+    nextRenewal: policy.week_end || "Next Week"
+  } : null;
 
   return (
-    <div className="max-w-shell mx-auto px-6 py-8 space-y-6">
+    <div className="max-w-shell mx-auto px-6 py-10 space-y-10 animate-fade-up">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-headline font-extrabold">Dashboard</h1>
-          <p className="text-sm text-on-surface-variant">Welcome back, Ravi. Your coverage is active.</p>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-2 border-b border-outline-variant/10">
+        <div className="space-y-1">
+          <h1 className="text-3xl md:text-4xl font-headline font-black tracking-tight text-on-surface">Dashboard</h1>
+          <p className="text-sm md:text-base text-on-surface-variant font-medium">
+            Welcome back, <span className="text-primary font-bold">{worker?.name?.split(" ")[0] || "Worker"}</span>. 
+            Your coverage is <StatusBadge status={policy?.status || "PENDING"} className="ml-2" />
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <SimulatorButton />
-          <Button size="sm" asChild>
-            <Link href="/worker/coverage">Upgrade Coverage <ArrowRight className="w-4 h-4" /></Link>
+          <Button size="default" className="shadow-cta px-6" asChild>
+            <Link href="/worker/policy">Manage Policy <ArrowRight className="w-4 h-4 ml-2" /></Link>
           </Button>
         </div>
       </div>
 
       {/* Disruption Banner */}
-      <DisruptionBanner event={activeEvent} />
+      {activeEvent && (
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-tertiary/20 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+          <DisruptionBanner event={activeEvent} />
+        </div>
+      )}
 
       {/* Main grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <PolicyCard />
-        <WeatherWidget />
-        <PremiumBadge />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <PolicyCard policy={policy} />
+        <WeatherWidget weather={weather} />
+        <PremiumBadge premium={premiumData} />
       </div>
 
       {/* Payout timeline */}
-      <PayoutTimeline />
+      <div className="pt-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-headline font-black text-on-surface flex items-center gap-2">
+            <span className="w-2 h-8 bg-primary rounded-full"></span>
+            Recent Payouts & Claims
+          </h2>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/worker/claims">View All <ArrowRight className="w-4 h-4 ml-2" /></Link>
+          </Button>
+        </div>
+        <PayoutTimeline claims={claims} />
+      </div>
     </div>
   );
 }

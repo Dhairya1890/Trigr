@@ -8,10 +8,7 @@ def _mask_upi(upi_id: str) -> str:
     if "@" not in upi_id:
         return upi_id
     handle, provider = upi_id.split("@", 1)
-    if len(handle) <= 2:
-        masked_handle = f"{handle[0]}*"
-    else:
-        masked_handle = f"{handle[:2]}{'*' * max(1, len(handle) - 2)}"
+    masked_handle = f"{handle[0]}*" if len(handle) <= 2 else f"{handle[:2]}{'*' * max(1, len(handle) - 2)}"
     return f"{masked_handle}@{provider}"
 
 
