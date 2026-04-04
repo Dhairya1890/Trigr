@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -8,6 +9,13 @@ from backend.routers import claims, policies, premium, triggers, workers
 from backend.services.trigger_monitor import run_trigger_monitor
 
 scheduler = BackgroundScheduler()
+
+
+def _get_allowed_origins() -> list[str]:
+    configured = os.getenv("FRONTEND_ORIGINS", "")
+    env_origins = [origin.strip() for origin in configured.split(",") if origin.strip()]
+    defaults = ["http://localhost:3000", "https://trigr.vercel.app"]
+    return list(dict.fromkeys(defaults + env_origins))
 
 
 @asynccontextmanager
@@ -24,7 +32,7 @@ app = FastAPI(title="Trigr API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://trigr.vercel.app"],
+    allow_origins=_get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -53,7 +53,10 @@ def _get_policy_record(worker_id: str) -> dict | None:
 
 
 def register_worker(worker_payload: dict, quote: dict) -> dict:
-    existing_worker = next((worker for worker in _STATE["workers"] if worker["upi_id"] == worker_payload["upi_id"]), None)
+    existing_worker = next(
+        (worker for worker in _STATE["workers"] if worker["upi_id"] == worker_payload["upi_id"]),
+        None,
+    )
     created_at = _now().isoformat()
 
     worker_record = {
@@ -275,7 +278,9 @@ def simulate_event(event_type: str, city: str, zones: list[str], severity: str) 
 
     if not affected_workers:
         city_workers = [
-            worker for worker in _STATE["workers"] if worker["role"] == "worker" and worker["city"].lower() == city.lower()
+            worker
+            for worker in _STATE["workers"]
+            if worker["role"] == "worker" and worker["city"].lower() == city.lower()
         ]
         if city_workers:
             affected_workers = [city_workers[0]]
@@ -373,7 +378,10 @@ def simulate_event(event_type: str, city: str, zones: list[str], severity: str) 
         "message": (
             f"{_event_label(normalized_type)} simulated for {city}. {len(new_claims)} claim(s) created."
             if new_claims
-            else f"{_event_label(normalized_type)} simulated for {city}, but no active worker matched the selected zone."
+            else (
+                f"{_event_label(normalized_type)} simulated for {city}, "
+                "but no active worker matched the selected zone."
+            )
         ),
         "event": deepcopy(event),
         "claims_created": len(new_claims),

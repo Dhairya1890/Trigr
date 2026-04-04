@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from backend.services.risk_scorer import score_risk
 
@@ -33,5 +33,5 @@ def calculate_weekly_premium(payload: dict) -> dict:
         "max_payout": max_payout,
         "coverage_pct": coverage_pct,
         "tier": tier,
-        "calculation_date": datetime.now(timezone.utc).isoformat(),
+        "calculation_date": datetime.now(UTC).isoformat(),
     }
