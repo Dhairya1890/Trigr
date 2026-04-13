@@ -59,6 +59,25 @@ class VerifyUpiRequest(BaseModel):
     worker_id: str
 
 
+class LocationAttestationRequest(BaseModel):
+    """Browser-collected location evidence used by the fraud engine."""
+
+    requested_city: str
+    requested_zone: str
+    gps: dict | None = None
+    network_geolocation: dict | None = None
+    network: dict = Field(default_factory=dict)
+    captured_at: str | None = None
+
+
+class LocationAttestationResponse(BaseModel):
+    """Response returned after saving worker browser telemetry."""
+
+    success: bool
+    worker_id: str
+    message: str
+
+
 # ---------------------------------------------------------------------------
 # Response schemas
 # ---------------------------------------------------------------------------

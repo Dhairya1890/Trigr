@@ -27,6 +27,8 @@ from backend.models.policy import (
 )
 from backend.models.premium import PremiumCalculationRequest, PremiumCalculationResponse
 from backend.models.worker import (
+    LocationAttestationRequest,
+    LocationAttestationResponse,
     VerifyUpiRequest,
     VerifyUpiResponse,
     Worker,
@@ -40,6 +42,8 @@ __all__ = [
     "Worker",
     "WorkerRegistrationRequest",
     "WorkerRegistrationResponse",
+    "LocationAttestationRequest",
+    "LocationAttestationResponse",
     "VerifyUpiRequest",
     "VerifyUpiResponse",
     "WorkerProfileResponse",

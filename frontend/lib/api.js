@@ -112,6 +112,15 @@ export const api = {
     return { verified: true, message: "UPI verified (Demo Mode)" };
   },
 
+  submitLocationAttestation: async (workerId, payload) => {
+    const res = await fetcher(`/workers/${workerId}/location-attestation`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (res || !IS_DEMO_MODE) return res;
+    return { success: true, worker_id: workerId, message: "Location attestation stored (Demo Mode)" };
+  },
+
   // --- PREMIUM & QUOTES ---
   calculatePremium: async (data) => {
     const res = await fetcher("/premium/calculate", {

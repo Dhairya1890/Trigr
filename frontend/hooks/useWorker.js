@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import { collectBrowserLocationSignals } from "@/lib/browserLocationSignals";
 
 function normalizePolicy(payload) {
   const policy = payload?.policy || payload;
@@ -39,6 +40,7 @@ export default function useWorker() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const hasLoadedRef = useRef(false);
+  const telemetrySentRef = useRef(false);
 
   useEffect(() => {
     if (authLoading) {
@@ -92,6 +94,16 @@ export default function useWorker() {
             setClaims(normalizeClaims(claimsData.claims));
           }
           hasLoadedRef.current = true;
+
+          if (!telemetrySentRef.current && mergedWorker?.id) {
+            telemetrySentRef.current = true;
+
+            collectBrowserLocationSignals(mergedWorker.city, mergedWorker.zone)
+              .then((attestation) => api.submitLocationAttestation(mergedWorker.id, attestation))
+              .catch((telemetryError) => {
+                console.warn("Telemetry capture skipped:", telemetryError);
+              });
+          }
         }
       } catch (err) {
         if (!cancelled) {

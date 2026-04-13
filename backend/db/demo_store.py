@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
+from math import asin, cos, radians, sin, sqrt
 from itertools import count
 from uuid import uuid4
 
@@ -14,6 +15,55 @@ from backend.services.payout_engine import calculate_payout
 _EVENT_COUNTER = count(1)
 _CLAIM_COUNTER = count(1)
 _PAYOUT_COUNTER = count(1)
+
+ZONE_CENTROIDS = {
+    "Mumbai": {
+        "Dharavi": (19.0400, 72.8550),
+        "Andheri": (19.1136, 72.8697),
+        "Kurla": (19.0726, 72.8826),
+        "Bandra": (19.0596, 72.8295),
+        "Sion": (19.0434, 72.8610),
+        "Thane": (19.2183, 72.9781),
+        "Borivali": (19.2307, 72.8567),
+    },
+    "Delhi": {
+        "Connaught Place": (28.6315, 77.2167),
+        "Lajpat Nagar": (28.5677, 77.2430),
+        "Dwarka": (28.5921, 77.0460),
+        "Rohini": (28.7495, 77.0565),
+        "Saket": (28.5245, 77.2066),
+        "Chandni Chowk": (28.6506, 77.2303),
+    },
+    "Bangalore": {
+        "Koramangala": (12.9352, 77.6245),
+        "Whitefield": (12.9698, 77.7500),
+        "HSR Layout": (12.9116, 77.6474),
+        "Marathahalli": (12.9591, 77.6974),
+    },
+    "Chennai": {
+        "T Nagar": (13.0418, 80.2337),
+        "Adyar": (13.0012, 80.2565),
+        "Velachery": (12.9807, 80.2212),
+        "Anna Nagar": (13.0850, 80.2101),
+    },
+    "Kolkata": {
+        "Salt Lake": (22.5867, 88.4170),
+        "Park Street": (22.5539, 88.3526),
+        "Howrah": (22.5958, 88.2636),
+        "New Town": (22.5750, 88.4797),
+    },
+    "Hyderabad": {
+        "Banjara Hills": (17.4138, 78.4396),
+        "Gachibowli": (17.4401, 78.3489),
+        "Madhapur": (17.4486, 78.3908),
+        "Secunderabad": (17.4399, 78.4983),
+    },
+}
+
+CITY_CENTROIDS = {
+    city: next(iter(zones.values()))
+    for city, zones in ZONE_CENTROIDS.items()
+}
 
 
 def _now() -> datetime:
@@ -30,10 +80,144 @@ def _bootstrap_state() -> dict:
     data = deepcopy(get_seed_data())
     data["fraud_queue"] = []
     data["simulated_events"] = []
+    data["location_attestations"] = _seed_location_attestations(data["workers"])
     return data
 
 
+def _seed_location_attestations(workers: list[dict]) -> dict[str, dict]:
+    seeded = {}
+    for index, worker in enumerate(workers):
+        coords = ZONE_CENTROIDS.get(worker["city"], {}).get(worker["zone"])
+        if not coords:
+            continue
+
+        lat, lon = coords
+        seeded[worker["id"]] = {
+            "requested_city": worker["city"],
+            "requested_zone": worker["zone"],
+            "gps": {
+                "latitude": lat,
+                "longitude": lon,
+                "accuracy_m": 35,
+                "captured_at": _now().isoformat(),
+            },
+            # Browsers do not expose tower IDs. This low-accuracy sample is a
+            # network-assisted stand-in that the fraud engine compares with GPS.
+            "network_geolocation": {
+                "latitude": lat + (0.003 if index % 2 else -0.002),
+                "longitude": lon + (0.002 if index % 2 else -0.001),
+                "accuracy_m": 750,
+                "captured_at": _now().isoformat(),
+            },
+            "network": {
+                "online": True,
+                "connection_type": "cellular",
+                "effective_type": "4g",
+                "downlink_mbps": 11.2,
+                "rtt_ms": 90,
+                "save_data": False,
+                "wifi_present": False,
+                "timezone": "Asia/Calcutta",
+                "locale": "en-IN",
+                "user_agent": "seeded-demo-device",
+            },
+            "captured_at": _now().isoformat(),
+        }
+    return seeded
+
+
+def _haversine_km(point_a: tuple[float, float], point_b: tuple[float, float]) -> float:
+    lat1, lon1 = point_a
+    lat2, lon2 = point_b
+    d_lat = radians(lat2 - lat1)
+    d_lon = radians(lon2 - lon1)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+    hav = sin(d_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(d_lon / 2) ** 2
+    return 2 * 6371 * asin(sqrt(hav))
+
+
+def _zone_match(city: str, zone: str, location: dict | None, radius_km: float) -> bool | None:
+    if not location:
+        return None
+
+    centroid = ZONE_CENTROIDS.get(city, {}).get(zone)
+    if not centroid:
+        return None
+
+    point = (location.get("latitude"), location.get("longitude"))
+    if None in point:
+        return None
+
+    return _haversine_km(centroid, point) <= radius_km
+
+
+def _get_location_attestation(worker_id: str) -> dict | None:
+    resolved = _resolve_worker_id(worker_id)
+    attestation = _STATE["location_attestations"].get(resolved)
+    return deepcopy(attestation) if attestation else None
+
+
+def store_location_attestation(worker_id: str, attestation: dict) -> None:
+    resolved = _resolve_worker_id(worker_id)
+    _STATE["location_attestations"][resolved] = deepcopy(attestation)
+
+
 _STATE = _bootstrap_state()
+
+
+def _event_threshold_passed(event: dict) -> bool:
+    event_type = event.get("event_type")
+    trigger_value = event.get("trigger_value", 0)
+    if event_type == "HEAVY_RAIN":
+        return trigger_value >= 50
+    if event_type == "SEVERE_AQI":
+        return trigger_value >= 300
+    if event_type == "LOCAL_CURFEW":
+        return trigger_value >= 0.75
+    return True
+
+
+def _claim_history_matches_event(event: dict, worker: dict) -> dict:
+    matching_events = [
+        item
+        for item in _STATE["disruption_events"]
+        if item["city"].lower() == event["city"].lower()
+        and item["event_type"] == event["event_type"]
+        and worker["zone"] in item.get("zones", [])
+        and _event_threshold_passed(item)
+    ]
+
+    current_started_at = _iso_to_datetime(event.get("started_at"))
+    within_window = False
+    for matched in matching_events:
+        started_at = _iso_to_datetime(matched.get("started_at"))
+        ended_at = _iso_to_datetime(matched.get("ended_at")) or (started_at + timedelta(hours=6) if started_at else None)
+        if started_at and ended_at and current_started_at and started_at <= current_started_at <= ended_at + timedelta(hours=24):
+            within_window = True
+            break
+
+    return {
+        "historical_trigger_match": bool(matching_events),
+        "zone_in_affected_history": bool(matching_events),
+        "within_trigger_window": within_window,
+        "historical_matches": len(matching_events),
+    }
+
+
+def _historical_claim_velocity_anomaly(event: dict, claim_count: int) -> bool:
+    historical_counts = [
+        item.get("workers_affected", 0)
+        for item in _STATE["disruption_events"]
+        if item["city"].lower() == event["city"].lower()
+        and item["event_type"] == event["event_type"]
+        and item["id"] != event["id"]
+    ]
+    if not historical_counts:
+        return False
+
+    historical_average = sum(historical_counts) / len(historical_counts)
+    return claim_count > max(historical_average * 2.5, historical_average + 10)
 
 
 def _resolve_worker_id(worker_id: str) -> str:
@@ -103,6 +287,7 @@ def register_worker(worker_payload: dict, quote: dict) -> dict:
         "created_at": created_at,
     }
     _STATE["policies"].insert(0, policy_record)
+    _STATE["location_attestations"].update(_seed_location_attestations([worker_record]))
 
     return deepcopy(worker_record)
 
@@ -286,14 +471,28 @@ def simulate_event(event_type: str, city: str, zones: list[str], severity: str) 
             affected_workers = [city_workers[0]]
 
     new_claims = []
+    sync_cluster_size = len(affected_workers)
+    batch_velocity_anomaly = _historical_claim_velocity_anomaly(event, sync_cluster_size)
 
     for index, worker in enumerate(affected_workers):
         policy = _get_policy_record(worker["id"])
+        location_attestation = _get_location_attestation(worker["id"]) or {}
         prior_payouts = sum(
             claim["payout_amount"]
             for claim in _STATE["claims"]
             if claim["worker_id"] == worker["id"] and claim.get("status") == "PAID"
         )
+        history_match = _claim_history_matches_event(event, worker)
+
+        gps_matches_zone = _zone_match(worker["city"], worker["zone"], location_attestation.get("gps"), radius_km=2.2)
+        cell_tower_matches_zone = _zone_match(
+            worker["city"],
+            worker["zone"],
+            location_attestation.get("network_geolocation"),
+            radius_km=6.5,
+        )
+        wifi_present = bool(location_attestation.get("network", {}).get("wifi_present"))
+        wifi_matches_zone = cell_tower_matches_zone if wifi_present else None
 
         payout_result = calculate_payout(
             {
@@ -310,17 +509,23 @@ def simulate_event(event_type: str, city: str, zones: list[str], severity: str) 
         )
 
         fraud_input = {
-            "gps_matches_zone": index == 0,
+            "gps_matches_zone": gps_matches_zone if gps_matches_zone is not None else index == 0,
+            "cell_tower_matches_zone": cell_tower_matches_zone if cell_tower_matches_zone is not None else index == 0,
+            "wifi_matches_zone": wifi_matches_zone,
             "app_active_before": True,
+            "app_activity_pattern_normal": index == 0,
             "worker_moving": True,
+            "accelerometer_active": index == 0,
             "account_age_days": 45 if index == 0 else 4,
             "device_has_duplicate_accounts": index > 0,
             "recent_claims_count": 1 if index == 0 else 4,
+            "historical_trigger_match": history_match["historical_trigger_match"],
+            "zone_in_affected_history": history_match["zone_in_affected_history"],
+            "within_trigger_window": history_match["within_trigger_window"],
+            "sync_cluster_size": sync_cluster_size,
+            "claim_velocity_anomaly": batch_velocity_anomaly,
         }
         fraud_result = evaluate_fraud(fraud_input)
-
-        if index == 0:
-            fraud_result = {"fraud_score": 12, "signals": [], "verdict": "CLEAN"}
 
         claim_status = "PROCESSING"
         process_after = (now + timedelta(seconds=5)).isoformat()
@@ -350,6 +555,14 @@ def simulate_event(event_type: str, city: str, zones: list[str], severity: str) 
             "type": _event_label(normalized_type),
             "date": now.date().isoformat(),
             "amount": payout_result["payout"],
+            "fraud_evidence": {
+                "gps_matches_zone": gps_matches_zone,
+                "cell_tower_matches_zone": cell_tower_matches_zone,
+                "wifi_matches_zone": wifi_matches_zone,
+                "historical_matches": history_match["historical_matches"],
+                "sync_cluster_size": sync_cluster_size,
+                "claim_velocity_anomaly": batch_velocity_anomaly,
+            },
         }
         _STATE["claims"].insert(0, claim)
         new_claims.append(claim)

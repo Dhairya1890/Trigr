@@ -5,8 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from backend.db.demo_store import get_worker as get_demo_worker
 from backend.db.demo_store import register_worker as register_demo_worker
+from backend.db.demo_store import store_location_attestation as store_demo_location_attestation
 from backend.db.supabase import get_supabase_config
 from backend.models import (
+    LocationAttestationRequest,
+    LocationAttestationResponse,
     VerifyUpiRequest,
     VerifyUpiResponse,
     WorkerProfileResponse,
@@ -113,4 +116,18 @@ def verify_upi(payload: VerifyUpiRequest, db=Depends(get_db)):
         verified=True,
         message="UPI successfully verified and linked.",
         worker_id=payload.worker_id,
+    )
+
+
+@router.post("/{worker_id}/location-attestation", response_model=LocationAttestationResponse)
+def save_location_attestation(worker_id: str, payload: LocationAttestationRequest, db=Depends(get_db)):
+    store_demo_location_attestation(worker_id, payload.model_dump())
+
+    if db:
+        pass
+
+    return LocationAttestationResponse(
+        success=True,
+        worker_id=worker_id,
+        message="Browser location evidence saved for fraud checks.",
     )
